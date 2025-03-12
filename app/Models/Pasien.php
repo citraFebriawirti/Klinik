@@ -4,24 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Pasien extends Model
 {
     use HasFactory;
-
-    protected $table = 'pasien';
-
-
-
+    protected $table = 'tb_pasien';
+    protected $primaryKey = 'id_pasien';
     protected $fillable = [
-        'nik_pasien',
         'nama_pasien',
-        'tempatlahir_pasien',
+        'nik_pasien',
         'tanggallahir_pasien',
-        'jeniskelamin_pasien',
+        'jenis_kelamin_pasien',
         'alamat_pasien',
-        'nomorhp_pasien',
-
+        'no_hp_pasien',
     ];
+
+    public function pendaftaran()
+    {
+        return $this->hasMany(Pendaftaran::class, 'id_pasien');
+    }
 }
