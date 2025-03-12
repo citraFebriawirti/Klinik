@@ -1,0 +1,168 @@
+@startuml
+
+skinparam defaultFontsize 30
+
+skinparam defaultFontName Arial
+
+
+class User {
+    + id_user varchar(30)
+    + id_role varchar(30)
+    - kode_user varchar(30)
+    - email varchar(60)
+    - password varchar(100)
+    - status_user varchar(10)    
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class Role {
+    + id_role varchar(30)
+    - nama_role varchar(100)
+    ---
+    + save()
+    + update()
+    + delete()
+
+}
+
+class Admin {
+    + id_admin varchar(30)
+    - nama_admin varchar(100)
+    - jenis_kelamin_admin varchar(30)
+    - alamat_admin text
+    - nomor_hp_admin varchar(15)
+    - gambar_admin varchar(100)
+    - tanggal_gabung_admin datetime
+    - status_admin varchar(10)
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+
+
+class Pasien {
+    + id_pasien int
+    - nama_pasien varchar(100)
+    - tanggallahir_pasien date
+    - jenis_kelamin_pasien enum('L','P')
+    - alamat_pasien text
+    - nomor_hp_pasien varchar(15)    
+    - tanggal_daftar_pasien datetime    
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class Rekam_Medis {
+    + id_rekammedis int
+    + id_pasien int
+    + id_dokter int
+    - tanggal_rekammedis date
+    - keluhan_rekammedis text
+    - diagnosis_rekammedis text
+    - tindakan_rekammedis text
+   
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class Dokter {
+    + id_dokter int
+    - nama_dokter varchar(100)
+    - jenis_kelamin_dokter enum('L','P')
+    - alamat_dokter text
+    - nomor_hp_dokter varchar(15)
+    - gambar_dokter varchar(100)
+    - tanggal_gabung_dokter datetime
+    - status_dokter varchar(10)
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class janji_temu{
+    + id_janjitemu int
+    + id_pasien int
+    + id_dokter int
+    - tanggal_janjitemu date
+    - jam_janjitemu time
+    - keluhan_janjitemu text
+    - status_janjitemu enum('Diterima','Ditolak','Dibatalkan','Selesai')
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class resep{
+    + id_resep int
+    + id_rekammedis int
+    + id_dokter int
+    - tanggal_resep date
+    - status_resep enum('Diterima','Ditolak','Dibatalkan','Selesai')
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class detail_resep{
+    + id_detailresep int
+    + id_resep int
+    + id_obat int
+    - jumlah_obat_detail_resep int
+    - aturan_pakai_detail_resep text
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class obat{
+    + id_obat int
+    - nama_obat varchar(100)
+    - jenis_obat varchar(100)
+    - harga_obat int
+    - stok_obat int
+    - status_obat enum('Tersedia','Tidak Tersedia')
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class transaksi_pembayaran{
+    + id_transaksi int
+    + id_rekammedis int
+    + id_pasien int
+    - tanggal_transaksi date
+    - total_transaksi int
+    - status_transaksi enum('Lunas','Belum Lunas')
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+class detailtransaksi_pembayaran{
+    + id_detailtransaksi int
+    + id_transaksi int
+    - deskripsi_detailtransaksi text
+    - jumlah_obat_detail_transaksi int
+    - harga_obat_detail_transaksi int
+    ---
+    + save()
+    + update()
+    + delete()
+}
+
+@enduml
