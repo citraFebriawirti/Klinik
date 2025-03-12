@@ -10,18 +10,14 @@ class Pasien extends Model
 {
     use HasFactory;
 
-    protected $table = 'pasien';
-
-
-
+    protected $table = 'tb_pasien';
+    protected $primaryKey = 'id_pasien';
     protected $fillable = [
-        'nik_pasien',
         'nama_pasien',
-        'tempatlahir_pasien',
+        'nik_pasien',
         'tanggallahir_pasien',
-        'jeniskelamin_pasien',
+        'jenis_kelamin_pasien',
         'alamat_pasien',
-        'nomorhp_pasien',
-
+        'no_hp_pasien'
     ];
 }

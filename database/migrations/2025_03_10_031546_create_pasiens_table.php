@@ -13,16 +13,14 @@ class CreatePasiensTable extends Migration
      */
     public function up()
     {
-        Schema::create('pasien', function (Blueprint $table) {
-            $table->id();
-            $table->string('nik_pasien')->unique();
-
-            $table->string('nama_pasien');
-            $table->string('tempatlahir_pasien');
-            $table->date('tanggallahir_pasien'); // Format tanggal
-            $table->enum('jeniskelamin_pasien', ['Laki-laki', 'Perempuan']); // Pilihan tetap
-            $table->text('alamat_pasien'); // Bisa lebih panjang
-            $table->string('nomorhp_pasien', 15); // Maksimal 15 karakter untuk nomor HP
+        Schema::create('tb_pasien', function (Blueprint $table) {
+            $table->id('id_pasien');
+            $table->string('nama_pasien', 255);
+            $table->string('nik_pasien', 16)->unique();
+            $table->date('tanggallahir_pasien');
+            $table->enum('jenis_kelamin_pasien', ['L', 'P']);
+            $table->text('alamat_pasien');
+            $table->string('no_hp_pasien', 15);
             $table->timestamps();
         });
     }
@@ -34,6 +32,7 @@ class CreatePasiensTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('tb_pasien');
         Schema::dropIfExists('pasien');
     }
 }
