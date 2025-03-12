@@ -54,7 +54,7 @@
                 <th>Judul Buku</th>
                 <th>Penulis</th>
                 <th>Genre Buku</th>
-                <th>Aksi</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
