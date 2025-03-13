@@ -204,28 +204,11 @@
                                             <input type="checkbox" wire:model="is_racik"> Racik
                                         </label>
                                     </div>
-                                    <!-- Tambahkan input untuk nama racikan jika is_racik true -->
-                                    @if($is_racik)
-                                    <div class="mb-3">
-                                        <label class="form-label">Nama Racikan</label>
-                                        <input type="text" class="form-control" wire:model="nama_racik" placeholder="Masukkan nama racikan (contoh: Obat Batuk)">
-                                        @error('nama_racik') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    @endif
                                     <button type="button" wire:click="tambahItemResep" class="btn btn-primary btn-sm">Tambah ke Resep</button>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mt-3">
-                                        @php
-                                        $groupedResepItems = collect($resepItems)->groupBy('nama_racik');
-                                        @endphp
-                                        @foreach ($groupedResepItems as $namaRacik => $items)
-                                        @if ($namaRacik)
-                                        <h6 class="mb-2">Racikan: {{ $namaRacik }}</h6>
-                                        @else
-                                        <h6 class="mb-2">Obat Non-Racik</h6>
-                                        @endif
-                                        <table class="table table-sm table-bordered">
+                                        <table class="table table-sm">
                                             <thead>
                                                 <tr>
                                                     <th>Obat</th>
@@ -236,20 +219,19 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($items as $index => $item)
+                                                @foreach ($resepItems as $index => $item)
                                                 <tr>
                                                     <td>{{ $item['nama_obat'] }}</td>
                                                     <td>{{ $item['dosis'] }}</td>
                                                     <td>{{ $item['jumlah'] }}</td>
                                                     <td>{{ $item['aturan_pakai'] }}</td>
                                                     <td>
-                                                        <button type="button" wire:click="hapusItemResep({{ $groupedResepItems->keys()->search($namaRacik) * 1000 + $index }})" class="btn btn-danger btn-sm">Hapus</button>
+                                                        <button type="button" wire:click="hapusItemResep({{ $index }})" class="btn btn-danger btn-sm">Hapus</button>
                                                     </td>
                                                 </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -270,7 +252,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h6 class="modal-title" id="modalDetailPemeriksaanLabel">Detail Pemeriksaan</h6>
+                        <h5 class="modal-title" id="modalDetailPemeriksaanLabel">Detail Pemeriksaan</h5>
                         <button type="button" class="btn-close" wire:click="closeModal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -293,9 +275,7 @@
                         @endphp
                         @foreach ($groupedDetails as $namaRacik => $details)
                         @if ($namaRacik)
-                        <h6 class="mb-2">Racikan: {{ $namaRacik }}</h6>
-                        @else
-                        <h6 class="mb-2">Obat Non-Racik</h6>
+                        <strong>{{ $namaRacik }}</strong>
                         @endif
                         <table class="table table-sm table-bordered">
                             <thead>
