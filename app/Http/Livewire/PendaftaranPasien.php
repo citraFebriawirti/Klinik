@@ -64,7 +64,7 @@ class PendaftaranPasien extends Component
     public function simpanPendaftaran()
     {
         $this->validate([
-            'nik' => 'required|max:16',
+            'nik' => 'required|min:16|max:16',
             'nama' => 'required|max:255',
             'tanggal_lahir' => 'required|date',
             'jenis_kelamin' => 'required|in:L,P',

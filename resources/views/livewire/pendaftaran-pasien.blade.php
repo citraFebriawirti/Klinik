@@ -72,8 +72,7 @@
         <div class="row">
             <!-- Data Pasien -->
             <div class="col-lg-12">
-                <!-- <div class="card mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between"> -->
+
                 <form wire:submit.prevent="simpanPendaftaran">
                     @csrf
                     <div class="mb-3">
@@ -89,14 +88,14 @@
                     <div class="mb-3">
                         <label for="nama" class="form-label">Nama Pasien</label>
                         <input type="text" class="form-control" wire:model.lazy="nama"
-                            {{ $this->nik && $this->tanggal_lahir ? 'readonly' : '' }}>
+                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}>
                         @error('nama') <span class="text-danger">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-3">
                         <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                         <select class="form-control" wire:model.lazy="jenis_kelamin"
-                            {{ $this->nik && $this->tanggal_lahir ? 'readonly' : '' }}>
+                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}>
                             <option value="">-- Pilih Jenis Kelamin --</option>
                             <option value="L">Laki-Laki</option>
                             <option value="P">Perempuan</option>
@@ -107,14 +106,14 @@
                     <div class="mb-3">
                         <label for="alamat" class="form-label">Alamat</label>
                         <textarea class="form-control" wire:model.lazy="alamat"
-                            {{ $this->nik && $this->tanggal_lahir ? 'readonly' : '' }}></textarea>
+                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}></textarea>
                         @error('alamat') <span class="text-danger">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-3">
                         <label for="no_hp" class="form-label">No. HP</label>
                         <input type="text" class="form-control" wire:model.lazy="no_hp"
-                            {{ $this->nik && $this->tanggal_lahir ? 'readonly' : '' }}>
+                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}>
                         @error('no_hp') <span class="text-danger">{{ $message }}</span> @enderror
                     </div>
                     <div class="mb-3">
