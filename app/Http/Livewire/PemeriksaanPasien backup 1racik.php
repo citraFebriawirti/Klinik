@@ -3,12 +3,13 @@
 namespace App\Http\Livewire;
 
 use App\Models\Dokter;
+use App\Models\Obat;
 use App\Models\Pemeriksaan;
 use App\Models\Pendaftaran;
-use App\Models\Obat;
 use App\Models\Resep;
 use App\Models\ResepDetail;
 use Livewire\Component;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class PemeriksaanPasien extends Component
 {
@@ -26,14 +27,14 @@ class PemeriksaanPasien extends Component
     public $jumlah;
     public $aturan_pakai;
     public $is_racik = false;
-    public $nama_racik; // Properti baru untuk menyimpan nama racikan
 
     public $isOpen = false;
-    public $isDetailOpen = false;
-    public $selectedPemeriksaan = null;
+    public $isDetailOpen = false; // Untuk modal detail pemeriksaan
+    public $selectedPemeriksaan = null; // Data pemeriksaan yang dipilih untuk dilihat
 
-    public $search = '';
-    public $statusFilter = '';
+    // Properti untuk filter dan pencarian
+    public $search = ''; // Untuk pencarian nama, NIK, atau ID pendaftaran
+    public $statusFilter = ''; // Untuk filter status (kosong berarti semua)
 
     public function mount()
     {
@@ -45,6 +46,7 @@ class PemeriksaanPasien extends Component
     {
         $query = Pendaftaran::with('pasien', 'poli', 'pemeriksaan.resep.details.obat');
 
+        // Pencarian berdasarkan nama, NIK, atau ID pendaftaran
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('id_pendaftaran', 'like', '%' . $this->search . '%')
@@ -55,6 +57,7 @@ class PemeriksaanPasien extends Component
             });
         }
 
+        // Filter berdasarkan status
         if ($this->statusFilter) {
             $query->where('status_pendaftaran', $this->statusFilter);
         }
@@ -62,6 +65,7 @@ class PemeriksaanPasien extends Component
         $this->daftarPasien = $query->get();
     }
 
+    // Update daftar pasien ketika pencarian atau filter berubah
     public function updatedSearch()
     {
         $this->ambilPasien();
@@ -123,7 +127,6 @@ class PemeriksaanPasien extends Component
         $this->jumlah = '';
         $this->aturan_pakai = '';
         $this->is_racik = false;
-        $this->nama_racik = '';
         $this->selectedPemeriksaan = null;
     }
 
@@ -134,7 +137,6 @@ class PemeriksaanPasien extends Component
             'dosis' => 'required|string|max:50',
             'jumlah' => 'required|integer|min:1',
             'aturan_pakai' => 'required|string|max:255',
-            'nama_racik' => 'required_if:is_racik,1|string|max:255|nullable', // Nama racik wajib jika is_racik dicentang
         ]);
 
         $obat = Obat::find($this->id_obat);
@@ -145,16 +147,12 @@ class PemeriksaanPasien extends Component
             'jumlah' => $this->jumlah,
             'aturan_pakai' => $this->aturan_pakai,
             'is_racik' => $this->is_racik,
-            'nama_racik' => $this->is_racik ? $this->nama_racik : null, // Simpan nama racik jika is_racik true
         ];
 
-        // Reset field setelah menambah item
         $this->id_obat = null;
         $this->dosis = '';
         $this->jumlah = '';
         $this->aturan_pakai = '';
-        $this->is_racik = false;
-        $this->nama_racik = '';
     }
 
     public function hapusItemResep($index)
@@ -190,6 +188,7 @@ class PemeriksaanPasien extends Component
             ]);
 
             $totalHarga = 0;
+            $namaRacik = $this->is_racik ? "RACK-" . str_pad($resep->id_resep, 2, '0', STR_PAD_LEFT) : null;
             foreach ($this->resepItems as $item) {
                 $obat = Obat::find($item['id_obat']);
                 $subtotal = $obat->harga_obat * $item['jumlah'];
@@ -199,7 +198,7 @@ class PemeriksaanPasien extends Component
                     'id_resep' => $resep->id_resep,
                     'id_obat' => $item['id_obat'],
                     'is_racik' => $item['is_racik'],
-                    'nama_racik' => $item['nama_racik'], // Gunakan nama racik yang diinput dokter
+                    'nama_racik' => $item['is_racik'] ? $namaRacik : null,
                     'dosis_resep_detail' => $item['dosis'],
                     'jumlah_resep_detail' => $item['jumlah'],
                     'aturan_pakai_resep_detail' => $item['aturan_pakai'],

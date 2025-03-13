@@ -52,3 +52,7 @@ Route::get('/pendaftaran', function () {
 Route::get('/pemeriksaan', function () {
     return view('pemeriksaan-pasien.index');
 })->name('pemeriksaan');
+
+Route::get('/farmasi', function () {
+    return view('farmasi-resep.index');
+})->name('farmasi');
