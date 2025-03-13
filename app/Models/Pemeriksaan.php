@@ -17,4 +17,22 @@ class Pemeriksaan extends Model
         'catatan_pemeriksaan',
         'tanggal_periksa_pemeriksaan',
     ];
+
+    // Relasi dengan Pendaftaran
+    public function pendaftaran()
+    {
+        return $this->belongsTo(Pendaftaran::class, 'id_pendaftaran', 'id_pendaftaran');
+    }
+
+    // Relasi dengan Dokter
+    public function dokter()
+    {
+        return $this->belongsTo(Dokter::class, 'id_dokter', 'id_dokter');
+    }
+
+    // Relasi dengan Resep (one-to-one)
+    public function resep()
+    {
+        return $this->hasOne(Resep::class, 'id_pemeriksaan', 'id_pemeriksaan');
+    }
 }
