@@ -38,3 +38,7 @@ Route::get('/buku', function () {
 Route::get('/pendaftaran', function () {
     return view('pendaftaran-pasien.index');
 })->name('pendaftaran');
+
+Route::get('/pemeriksaan', function () {
+    return view('pemeriksaan-pasien.index');
+})->name('pemeriksaan');
