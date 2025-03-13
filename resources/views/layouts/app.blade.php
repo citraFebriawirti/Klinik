@@ -83,6 +83,13 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ request()->routeIs('obat') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('obat') }}" >
+                    <i class="fas fa-file-word"></i>
+                    <span>Data Obat</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ request()->routeIs('pasien') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('pasien') }}" >
                     <i class="fas fa-file-word"></i>
@@ -104,6 +111,8 @@
                     <span>Data Pemeriksaan</span>
                 </a>
             </li>
+
+          
             
             
             {{-- <li class="nav-item">
@@ -124,6 +133,13 @@
            </div>
 
             <hr class="sidebar-divider">
+
+            <li class="nav-item {{ request()->routeIs('pendaftaran') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('pendaftaran') }}">
+                    <i class="fas fa-file-word"></i>
+                    <span>Data Pendaftaran</span>
+                </a>
+            </li>
             <div class="version" id="version-ruangadmin"></div>
         </ul>
         <!-- Sidebar -->

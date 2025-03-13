@@ -23,6 +23,11 @@ Route::get('/poli', function () {
 })->name('poli');
 
 
+Route::get('/obat', function () {
+    return view('obat.index');
+})->name('obat');
+
+
 
 Route::get('/pasien', function () {
     return view('pasien.index');
