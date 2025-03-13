@@ -4,37 +4,35 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Dokter as ModelsDokter;
+use App\Models\Poli as ModelsPoli;
 use Illuminate\Support\Facades\Schema;
 
-/*************  ✨ Codeium Command ⭐  *************/
-/**
- * Render the component.
- *
- * @return \Illuminate\View\View
- */
-/******  a43230aa-57d8-4a79-b0f0-188d1b96e20e  *******/ class Dokter extends Component
+class Dokter extends Component
 {
-    public $dokter, $kode_dokter, $nama_dokter, $spesialis_dokter, $nomorhp_dokter, $dokter_id, $searchTerm;
+    public $dokter, $id_dokter, $nama_dokter, $id_poli, $spesialisasi_dokter, $no_hp_dokter, $searchTerm;
     public $isOpen = 0;
     protected $listeners = ['destroy'];
 
     public function render()
     {
-        $query = ModelsDokter::query();
+        $query = ModelsDokter::with('poli');
 
         if ($this->searchTerm) {
             $query->where(function ($q) {
-                $q->where('kode_dokter', 'like', '%' . $this->searchTerm . '%')
+                $q->where('id_dokter', 'like', '%' . $this->searchTerm . '%')
                     ->orWhere('nama_dokter', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('spesialis_dokter', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('nomorhp_dokter', 'like', '%' . $this->searchTerm . '%');
+                    ->orWhere('spesialisasi_dokter', 'like', '%' . $this->searchTerm . '%')
+                    ->orWhere('no_hp_dokter', 'like', '%' . $this->searchTerm . '%');
             });
         }
 
         $this->dokter = $query->get();
 
+        $poli = ModelsPoli::all(); // Ambil semua data Poli
+
         return view('livewire.dokter', [
-            'dokter' => $this->dokter
+            'dokter' => $this->dokter,
+            'poli' => $poli, // Kirim variabel poli ke view
         ]);
     }
 
@@ -63,32 +61,32 @@ use Illuminate\Support\Facades\Schema;
 
     public function resetFields()
     {
-        $this->kode_dokter = '';
+        $this->id_dokter = null;
         $this->nama_dokter = '';
-        $this->spesialis_dokter = '';
-        $this->nomorhp_dokter = '';
-        $this->dokter_id = null;
+        $this->id_poli = '';
+        $this->spesialisasi_dokter = '';
+        $this->no_hp_dokter = '';
     }
 
     public function store()
     {
         $this->validate([
-            'kode_dokter' => 'required|unique:dokter,kode_dokter,' . ($this->dokter_id ?? 'NULL'),
             'nama_dokter' => 'required',
-            'spesialis_dokter' => 'required',
-            'nomorhp_dokter' => 'required|max:15',
+            'id_poli' => 'required|exists:tb_poli,id_poli',
+            'spesialisasi_dokter' => 'required',
+            'no_hp_dokter' => 'nullable|max:15',
         ]);
 
-        ModelsDokter::updateOrCreate(['id' => $this->dokter_id], [
-            'kode_dokter' => $this->kode_dokter,
+        ModelsDokter::updateOrCreate(['id_dokter' => $this->id_dokter], [
             'nama_dokter' => $this->nama_dokter,
-            'spesialis_dokter' => $this->spesialis_dokter,
-            'nomorhp_dokter' => $this->nomorhp_dokter,
+            'id_poli' => $this->id_poli,
+            'spesialisasi_dokter' => $this->spesialisasi_dokter,
+            'no_hp_dokter' => $this->no_hp_dokter,
         ]);
 
         $this->dispatchBrowserEvent('alert', [
             'title' => 'Berhasil!',
-            'text' => $this->dokter_id ? 'Data berhasil diupdate' : 'Data berhasil ditambahkan',
+            'text' => $this->id_dokter ? 'Data berhasil diupdate' : 'Data berhasil ditambahkan',
             'icon' => 'success'
         ]);
 
@@ -96,14 +94,14 @@ use Illuminate\Support\Facades\Schema;
         $this->resetFields();
     }
 
-    public function edit($id)
+    public function edit($id_dokter)
     {
-        $dokter = ModelsDokter::findOrFail($id);
-        $this->dokter_id = $id;
-        $this->kode_dokter = $dokter->kode_dokter;
+        $dokter = ModelsDokter::findOrFail($id_dokter);
+        $this->id_dokter = $id_dokter;
         $this->nama_dokter = $dokter->nama_dokter;
-        $this->spesialis_dokter = $dokter->spesialis_dokter;
-        $this->nomorhp_dokter = $dokter->nomorhp_dokter;
+        $this->id_poli = $dokter->id_poli;
+        $this->spesialisasi_dokter = $dokter->spesialisasi_dokter;
+        $this->no_hp_dokter = $dokter->no_hp_dokter;
 
         $this->openModal();
     }
@@ -120,8 +118,9 @@ use Illuminate\Support\Facades\Schema;
 
     public function destroy($id)
     {
-        if (Schema::hasTable('dokter')) {
-            ModelsDokter::find($id)?->delete();
+        if (Schema::hasTable('tb_dokter')) {
+
+            ModelsDokter::where('id_dokter', $id)->delete();
 
             $this->dispatchBrowserEvent('alert', [
                 'title' => 'Berhasil!',

@@ -59,20 +59,15 @@
                     </div>
 
                     <div class="p-3">
-                        <!-- Input Pencarian -->
-                     
-
-                        
-
+                    
                         <!-- Tabel Data -->
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
-                                    <tr>
-                                        <th>No</th>
+                                    <tr class="text-center">
+                                        <th style="width: 10px">No</th>
                                         <th>NIK</th>
                                         <th>Nama</th>
-                                        <th>Tempat Lahir</th>
                                         <th>Tanggal Lahir</th>
                                         <th>Jenis Kelamin</th>
                                         <th>Alamat</th>
@@ -86,15 +81,17 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $p->nik_pasien }}</td>
                                         <td>{{ $p->nama_pasien }}</td>
-                                        <td>{{ $p->tempatlahir_pasien }}</td>
+                                    
                                         <td>{{ $p->tanggallahir_pasien }}</td>
-                                        <td>{{ $p->jeniskelamin_pasien }}</td>
+                                        <td>{{ $p->jenis_kelamin_pasien }}</td>
                                         <td>{{ $p->alamat_pasien }}</td>
-                                        <td>{{ $p->nomorhp_pasien }}</td>
-                                        <td>
-                                            <button wire:click.prevent="edit({{ $p->id }})" class="btn btn-warning">Edit</button>
-                                            <button wire:click="delete({{ $p->id }})" class="btn btn-danger">Hapus</button>
+                                        <td>{{ $p->no_hp_pasien }}</td>
+                                        <td class="d-flex">
+                                            <button wire:click.prevent="edit({{ $p->id_pasien }})" class="btn btn-warning mr-1">Edit</button>
+                                            <button wire:click="delete({{ $p->id_pasien }})" class="btn btn-danger">Hapus</button>
+
                                         </td>
+                                        
                                     </tr>
                                     @empty
                                     <tr>
@@ -117,7 +114,7 @@
                     <form wire:submit.prevent="store">
                         @csrf
                         <div class="modal-header">
-                            <h5 class="modal-title">{{ $pasien_id ? 'Edit Pasien' : 'Tambah Pasien' }}</h5>
+                            <h5 class="modal-title">{{ $id_pasien ? 'Edit Pasien' : 'Tambah Pasien' }}</h5>
                             <button type="button" class="btn-close" wire:click="closeModal"></button>
                         </div>
                         <div class="modal-body">
@@ -136,11 +133,7 @@
                                         <input type="text" class="form-control" wire:model="nama_pasien">
                                         @error('nama_pasien') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
-                                    <div class="mb-3">
-                                        <label>Tempat Lahir</label>
-                                        <input type="text" class="form-control" wire:model="tempatlahir_pasien">
-                                        @error('tempatlahir_pasien') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
+                                  
                                     <div class="mb-3">
                                         <label>Tanggal Lahir</label>
                                         <input type="date" class="form-control" wire:model="tanggallahir_pasien">
@@ -151,12 +144,12 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label>Jenis Kelamin</label>
-                                        <select class="form-control" wire:model="jeniskelamin_pasien">
+                                        <select class="form-control" wire:model="jenis_kelamin_pasien">
                                             <option value="">Pilih</option>
-                                            <option value="Laki-laki">Laki-laki</option>
-                                            <option value="Perempuan">Perempuan</option>
+                                            <option value="L">Laki-laki</option>
+                                            <option value="P">Perempuan</option>
                                         </select>
-                                        @error('jeniskelamin_pasien') <span class="text-danger">{{ $message }}</span> @enderror
+                                        @error('jenis_kelamin_pasien') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label>Alamat</label>
@@ -165,10 +158,10 @@
                                     </div>
                                     <div class="mb-3">
                                         <label>Nomor HP</label>
-                                        <input type="text" class="form-control" wire:model="nomorhp_pasien" 
+                                        <input type="text" class="form-control" wire:model="no_hp_pasien" 
                                                pattern="08\d{8,11}" inputmode="numeric" maxlength="13" required 
                                                title="Nomor HP harus diawali dengan 08 dan terdiri dari 10-13 digit angka">
-                                        @error('nomorhp_pasien') <span class="text-danger">{{ $message }}</span> @enderror
+                                        @error('no_hp_pasien') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                             </div>

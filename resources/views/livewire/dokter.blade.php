@@ -58,31 +58,34 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Kode Dokter</th>
-                                        <th>Nama</th>
+                                        <th>Nama Dokter</th>
+                                        <th>Poli</th>
                                         <th>Spesialis</th>
                                         <th>Nomor HP</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($dokter as $d)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $d->kode_dokter }}</td>
-                                        <td>{{ $d->nama_dokter }}</td>
-                                        <td>{{ $d->spesialis_dokter }}</td>
-                                        <td>{{ $d->nomorhp_dokter }}</td>
-                                        <td>
-                                            <button wire:click.prevent="edit({{ $d->id }})" class="btn btn-warning">Edit</button>
-                                            <button wire:click="delete({{ $d->id }})" class="btn btn-danger">Hapus</button>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center">Data tidak ditemukan</td>
-                                    </tr>
-                                    @endforelse
+                                    <tbody>
+                                        @forelse($dokter as $d)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $d->nama_dokter }}</td>
+                                            <td>{{ $d->poli->nama_poli ?? '-' }}</td> <!-- Menampilkan nama poli -->
+                                            <td>{{ $d->spesialisasi_dokter }}</td>
+                                            <td>{{ $d->no_hp_dokter ?? '-' }}</td>
+                                            <td>
+                                                <button wire:click.prevent="edit({{ $d->id_dokter }})" class="btn btn-warning">Edit</button>
+                                                <button wire:click="delete({{ $d->id_dokter }})" class="btn btn-danger">Hapus</button>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center">Data tidak ditemukan</td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -98,30 +101,44 @@
                     <form wire:submit.prevent="store">
                         @csrf
                         <div class="modal-header">
-                            <h5 class="modal-title">{{ $dokter_id ? 'Edit Dokter' : 'Tambah Dokter' }}</h5>
+                            <h5 class="modal-title">{{ $id_dokter ? 'Edit Dokter' : 'Tambah Dokter' }}</h5>
                             <button type="button" class="btn-close" wire:click="closeModal"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label>Kode Dokter</label>
-                                <input type="int" class="form-control" wire:model="kode_dokter" required>
-                                @error('kode_dokter') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label>Nama</label>
+                                <label>Nama Dokter</label>
                                 <input type="text" class="form-control" wire:model="nama_dokter" required>
                                 @error('nama_dokter') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                            
                             <div class="mb-3">
-                                <label>Spesialis</label>
-                                <input type="text" class="form-control" wire:model="spesialis_dokter" required>
-                                @error('spesialis_dokter') <span class="text-danger">{{ $message }}</span> @enderror
+                                <label>Poli</label>
+                                <select class="form-control" wire:model="id_poli" required>
+                                    <option value="">Pilih Poli</option>
+                                    @foreach($poli as $p) 
+                                    <option value="{{ strval($p->id_poli) }}" data-nama="{{ $p->nama_poli }}">
+                                        {{ $p->nama_poli }}
+                                    </option>
+                                @endforeach
+                                </select>
+
+
+                              
+                                @error('id_poli') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                            
+                            <div class="mb-3">
+                                <label>Spesialisasi</label>
+                                <input type="text" class="form-control" wire:model="spesialisasi_dokter" required>
+                                @error('spesialisasi_dokter') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            
                             <div class="mb-3">
                                 <label>Nomor HP</label>
-                                <input type="text" class="form-control" wire:model="nomorhp_dokter" pattern="08\d{8,11}" inputmode="numeric" maxlength="15" required title="Nomor HP harus diawali dengan 08 dan terdiri dari 10-15 digit angka">
-                                @error('nomorhp_dokter') <span class="text-danger">{{ $message }}</span> @enderror
+                                <input type="text" class="form-control" wire:model="no_hp_dokter" pattern="08\d{8,11}" inputmode="numeric" maxlength="15" required>
+                                @error('no_hp_dokter') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                            
                         </div>
                         <div class="modal-footer">
                             <button type="button" wire:click="closeModal" class="btn btn-secondary">Tutup</button>

@@ -8,26 +8,29 @@ use Illuminate\Support\Facades\Schema;
 
 class Pasien extends Component
 {
-    public $pasien, $nik_pasien, $nama_pasien, $tempatlahir_pasien, $tanggallahir_pasien,
-        $jeniskelamin_pasien, $alamat_pasien, $nomorhp_pasien, $pasien_id, $searchTerm;
+    public $pasien, $nik_pasien, $nama_pasien, $tanggallahir_pasien,
+        $jenis_kelamin_pasien, $alamat_pasien, $no_hp_pasien, $id_pasien, $searchTerm;
     public $isOpen = 0;
-    protected $listeners = ['destroy'];
+    protected $listeners = ['destroy']; // Menangani event hapus
+
+    public function mount($id_pasien = null) // Mengubah parameter menjadi id_pasien
+    {
+        $this->id = $id_pasien;
+    }
 
     public function render()
-
     {
-        $query = ModelsPasien::query(); // Query hanya untuk tabel pasien
+        $query = ModelsPasien::query(); // Query hanya untuk tabel tb_pasien
 
         // Pencarian berdasarkan semua field pasien
         if ($this->searchTerm) {
             $query->where(function ($q) {
                 $q->where('nik_pasien', 'like', '%' . $this->searchTerm . '%')
                     ->orWhere('nama_pasien', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('tempatlahir_pasien', 'like', '%' . $this->searchTerm . '%')
                     ->orWhere('tanggallahir_pasien', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('jeniskelamin_pasien', 'like', '%' . $this->searchTerm . '%')
+                    ->orWhere('jenis_kelamin_pasien', 'like', '%' . $this->searchTerm . '%')
                     ->orWhere('alamat_pasien', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('nomorhp_pasien', 'like', '%' . $this->searchTerm . '%');
+                    ->orWhere('no_hp_pasien', 'like', '%' . $this->searchTerm . '%');
             });
         }
 
@@ -38,13 +41,11 @@ class Pasien extends Component
         ]);
     }
 
-
-
-
     public function resetFilter()
     {
         $this->searchTerm = '';
     }
+
     public function create()
     {
         $this->resetFields();
@@ -67,39 +68,36 @@ class Pasien extends Component
     {
         $this->nik_pasien = '';
         $this->nama_pasien = '';
-        $this->tempatlahir_pasien = '';
         $this->tanggallahir_pasien = '';
-        $this->jeniskelamin_pasien = '';
+        $this->jenis_kelamin_pasien = '';
         $this->alamat_pasien = '';
-        $this->nomorhp_pasien = '';
-        $this->pasien_id = null;
+        $this->no_hp_pasien = '';
+        $this->id_pasien = null;
     }
 
     public function store()
     {
         $this->validate([
-            'nik_pasien' => 'required|unique:pasien,nik_pasien,' . ($this->pasien_id ?? 'NULL'),
+            'nik_pasien' => 'required|unique:tb_pasien,nik_pasien,' . ($this->id_pasien ?? 'NULL') . ',id_pasien',
             'nama_pasien' => 'required',
-            'tempatlahir_pasien' => 'required',
             'tanggallahir_pasien' => 'required|date',
-            'jeniskelamin_pasien' => 'required|in:Laki-laki,Perempuan',
+            'jenis_kelamin_pasien' => 'required|in:L,P',
             'alamat_pasien' => 'required',
-            'nomorhp_pasien' => 'required|max:15',
+            'no_hp_pasien' => 'required|max:15',
         ]);
 
-        ModelsPasien::updateOrCreate(['id' => $this->pasien_id], [
+        ModelsPasien::updateOrCreate(['id_pasien' => $this->id_pasien], [
             'nik_pasien' => $this->nik_pasien,
             'nama_pasien' => $this->nama_pasien,
-            'tempatlahir_pasien' => $this->tempatlahir_pasien,
             'tanggallahir_pasien' => $this->tanggallahir_pasien,
-            'jeniskelamin_pasien' => $this->jeniskelamin_pasien,
+            'jenis_kelamin_pasien' => $this->jenis_kelamin_pasien,
             'alamat_pasien' => $this->alamat_pasien,
-            'nomorhp_pasien' => $this->nomorhp_pasien,
+            'no_hp_pasien' => $this->no_hp_pasien,
         ]);
 
         $this->dispatchBrowserEvent('alert', [
             'title' => 'Berhasil!',
-            'text' => $this->pasien_id ? 'Data berhasil diupdate' : 'Data berhasil ditambahkan',
+            'text' => $this->id_pasien ? 'Data berhasil diupdate' : 'Data berhasil ditambahkan',
             'icon' => 'success'
         ]);
 
@@ -107,28 +105,21 @@ class Pasien extends Component
         $this->resetFields();
     }
 
-    /**
-     * Melakukan pengeditan data pasien berdasarkan ID yang diberikan
-     *
-     * @param int $id ID pasien yang akan diedit
-     * @return void
-     */
-    public function edit($id)
+    public function edit($id_pasien) // Mengubah parameter menjadi id_pasien
     {
-        $pasien = ModelsPasien::findOrFail($id);
-        $this->pasien_id = $id;
+        $pasien = ModelsPasien::where('id_pasien', $id_pasien)->firstOrFail();
+        $this->id_pasien = $id_pasien;
         $this->nik_pasien = $pasien->nik_pasien;
         $this->nama_pasien = $pasien->nama_pasien;
-        $this->tempatlahir_pasien = $pasien->tempatlahir_pasien;
         $this->tanggallahir_pasien = $pasien->tanggallahir_pasien;
-        $this->jeniskelamin_pasien = $pasien->jeniskelamin_pasien;
+        $this->jenis_kelamin_pasien = $pasien->jenis_kelamin_pasien;
         $this->alamat_pasien = $pasien->alamat_pasien;
-        $this->nomorhp_pasien = $pasien->nomorhp_pasien;
+        $this->no_hp_pasien = $pasien->no_hp_pasien;
 
         $this->openModal();
     }
 
-    public function delete($id)
+    public function delete($id) // Mengubah parameter menjadi id_pasien
     {
         $this->dispatchBrowserEvent('confirmDelete', [
             'id' => $id,
@@ -138,10 +129,10 @@ class Pasien extends Component
         ]);
     }
 
-    public function destroy($id)
+    public function destroy($id) // Mengubah parameter menjadi id_pasien
     {
-        if (Schema::hasTable('pasien')) {
-            ModelsPasien::find($id)?->delete();
+        if (Schema::hasTable('tb_pasien')) {
+            ModelsPasien::where('id_pasien', $id)->delete();
 
             $this->dispatchBrowserEvent('alert', [
                 'title' => 'Berhasil!',

@@ -18,6 +18,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/poli', function () {
+    return view('poli.index');
+})->name('poli');
+
+
 
 Route::get('/pasien', function () {
     return view('pasien.index');

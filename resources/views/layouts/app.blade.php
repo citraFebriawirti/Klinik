@@ -22,7 +22,32 @@
     {{-- search --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css">
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-    
+    <style>
+    .nav-item .nav-link {
+    color: rgb(255, 255, 255); /* Warna default */
+    transition: 0.3s;
+}
+
+.nav-item .nav-link:hover,
+.nav-item .nav-link:focus {
+    background-color: #b99044;
+    color: white;
+    border-radius: 5px;
+}
+
+.nav-item.active .nav-link {
+    background-color: #b99044;
+    color: white;
+    /* border-radius: 5px; */
+}
+
+.nav-item.active .nav-link span
+{
+    color: white;
+ 
+}
+
+    </style>
 </head>
 
 <body id="page-top">
@@ -42,7 +67,8 @@
                 <div class="sidebar-brand-text mx-3">SIMKLINIK</div>
             </a>
             <hr class="sidebar-divider my-0">
-            <li class="nav-item active">
+           <div>
+            <li class="nav-item ">
                 <a class="nav-link" href="">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
@@ -50,17 +76,22 @@
 
 
 
+            <li class="nav-item {{ request()->routeIs('poli') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('poli') }}" >
+                    <i class="fas fa-file-word"></i>
+                    <span>Data Poli</span>
+                </a>
+            </li>
 
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('pasien') }}">
+            <li class="nav-item {{ request()->routeIs('pasien') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('pasien') }}" >
                     <i class="fas fa-file-word"></i>
                     <span>Data Pasien</span>
                 </a>
             </li>
             
             
-            <li class="nav-item">
+            <li class="nav-item {{ request()->routeIs('dokter') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('dokter') }}">
                     <i class="fas fa-file-word"></i>
                     <span>Data Dokter</span>
@@ -82,6 +113,7 @@
                     <span>Data Users</span>
                 </a>
             </li>
+           </div>
 
             <hr class="sidebar-divider">
             <div class="version" id="version-ruangadmin"></div>
