@@ -172,7 +172,7 @@ Menyimpan daftar obat yang tersedia di farmasi.
 
 ## 📌 7. Tabel `tb_resep`
 
-Menyimpan resep obat yang diberikan oleh dokter.
+Menyimpan resep obat yang diberikan oleh dokter tambahakan id_pendaftaran
 
 | Nama Kolom          | Tipe Data                                | Keterangan                 |
 | ------------------- | ---------------------------------------- | -------------------------- |
