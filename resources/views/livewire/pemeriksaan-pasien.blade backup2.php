@@ -23,28 +23,12 @@
                 }
             });
 
-            window.addEventListener('openDetailModal', function() {
-                console.log('Event openDetailModal diterima');
-                const modalElement = document.getElementById('modalDetailPemeriksaan');
-                if (modalElement) {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                } else {
-                    console.error('Modal detail element tidak ditemukan');
-                }
-            });
-
             window.addEventListener('closeModal', function() {
                 console.log('Event closeModal diterima');
                 const modalElement = document.getElementById('modalPemeriksaan');
-                const modalDetailElement = document.getElementById('modalDetailPemeriksaan');
                 if (modalElement) {
                     const modal = bootstrap.Modal.getInstance(modalElement);
                     if (modal) modal.hide();
-                }
-                if (modalDetailElement) {
-                    const modalDetail = bootstrap.Modal.getInstance(modalDetailElement);
-                    if (modalDetail) modalDetail.hide();
                 }
             });
         });
@@ -69,22 +53,6 @@
                     </div>
 
                     <div class="p-3">
-                        <!-- Filter dan Pencarian -->
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="statusFilter">Filter Status</label>
-                                <select wire:model="statusFilter" class="form-control" id="statusFilter">
-                                    <option value="">Semua Status</option>
-                                    <option value="Menunggu">Menunggu</option>
-                                    <option value="Selesai">Selesai</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="search">Cari Pasien</label>
-                                <input type="text" wire:model.debounce.500ms="search" class="form-control" id="search" placeholder="Nama, NIK, atau ID Pendaftaran">
-                            </div>
-                        </div>
-
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -94,7 +62,6 @@
                                         <th>NIK</th>
                                         <th>Nama</th>
                                         <th>Poli</th>
-                                        <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -107,23 +74,12 @@
                                         <td>{{ $pasien->pasien->nama_pasien }}</td>
                                         <td>{{ $pasien->poli->nama_poli }}</td>
                                         <td>
-                                            @if($pasien->status_pendaftaran == 'Menunggu')
-                                            <span class="badge badge-warning">Menunggu</span>
-                                            @else
-                                            <span class="badge badge-success">Selesai</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($pasien->status_pendaftaran == 'Menunggu')
-                                            <button wire:click="pilihPasien({{ $pasien->id_pendaftaran }})" class="btn btn-info btn-sm">Periksa</button>
-                                            @else
-                                            <button wire:click="lihatDetail({{ $pasien->id_pendaftaran }})" class="btn btn-secondary btn-sm">Lihat Detail</button>
-                                            @endif
+                                            <button wire:click="pilihPasien({{ $pasien->id_pendaftaran }})" class="btn btn-info">Periksa</button>
                                         </td>
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="7" class="text-center">Data tidak ditemukan</td>
+                                        <td colspan="6" class="text-center">Data tidak ditemukan</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
@@ -134,7 +90,6 @@
             </div>
         </div>
 
-        <!-- Modal Pemeriksaan -->
         @if($isOpen)
         <div class="modal fade show d-block" id="modalPemeriksaan" tabindex="-1" aria-labelledby="modalPemeriksaanLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
@@ -205,6 +160,7 @@
                                         </label>
                                     </div>
                                     <button type="button" wire:click="tambahItemResep" class="btn btn-primary btn-sm">Tambah ke Resep</button>
+
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mt-3">
@@ -241,74 +197,6 @@
                             <button type="submit" class="btn btn-success">Simpan Pemeriksaan</button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-        @endif
-
-        <!-- Modal Detail Pemeriksaan -->
-        @if($isDetailOpen && $selectedPemeriksaan)
-        <div class="modal fade show d-block" id="modalDetailPemeriksaan" tabindex="-1" aria-labelledby="modalDetailPemeriksaanLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalDetailPemeriksaanLabel">Detail Pemeriksaan</h5>
-                        <button type="button" class="btn-close" wire:click="closeModal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">ID Pendaftaran</label>
-                            <input type="text" class="form-control" value="{{ $selectedPemeriksaan->id_pendaftaran }}" disabled>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Diagnosa</label>
-                            <input type="text" class="form-control" value="{{ $selectedPemeriksaan->diagnosa_pemeriksaan }}" disabled>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Catatan</label>
-                            <textarea class="form-control" disabled>{{ $selectedPemeriksaan->catatan_pemeriksaan }}</textarea>
-                        </div>
-                        @if($selectedPemeriksaan->resep)
-                        <h6>Resep Obat</h6>
-                        @php
-                        $groupedDetails = $selectedPemeriksaan->resep->details->groupBy('nama_racik');
-                        @endphp
-                        @foreach ($groupedDetails as $namaRacik => $details)
-                        @if ($namaRacik)
-                        <strong>{{ $namaRacik }}</strong>
-                        @endif
-                        <table class="table table-sm table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Kode</th>
-                                    <th>Nama</th>
-                                    <th>Dosis</th>
-                                    <th>Qty</th>
-                                    <th>Satuan</th>
-                                    <th>Cara Pakai</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($details as $detail)
-                                <tr>
-                                    <td>{{ $detail->obat->id_obat }}</td>
-                                    <td>{{ $detail->obat->nama_obat }}</td>
-                                    <td>{{ $detail->dosis_resep_detail }}</td>
-                                    <td>{{ $detail->jumlah_resep_detail }}</td>
-                                    <td>{{ $detail->obat->satuan_obat }}</td>
-                                    <td>{{ $detail->aturan_pakai_resep_detail }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        @endforeach
-                        @else
-                        <p>Tidak ada resep untuk pemeriksaan ini.</p>
-                        @endif
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" wire:click="closeModal" class="btn btn-secondary">Tutup</button>
-                    </div>
                 </div>
             </div>
         </div>
