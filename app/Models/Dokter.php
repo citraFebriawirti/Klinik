@@ -8,16 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Dokter extends Model
 {
     use HasFactory;
-
-    protected $table = 'dokter';
-
-
-
+    protected $table = 'tb_dokter';
+    protected $primaryKey = 'id_dokter';
     protected $fillable = [
-        'kode_dokter',
         'nama_dokter',
-        'spesialis_dokter',
-        'nomorhp_dokter',
-
+        'id_poli',
+        'spesialisasi_dokter',
+        'no_hp_dokter',
     ];
+
+    public function pemeriksaan()
+    {
+        return $this->hasMany(Pemeriksaan::class, 'id_dokter');
+    }
+
+    public function poli()
+    {
+        return $this->belongsTo(Poli::class, 'id_poli');
+    }
 }
