@@ -59,80 +59,80 @@
 
 
     <div class="container-fluid" id="container-wrapper">
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Pendaftaran Pasien</h1>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="./">Home</a></li>
-                <li class="breadcrumb-item">Tables</li>
-                <li class="breadcrumb-item active" aria-current="page">Pendaftaran</li>
-            </ol>
+        <div class="d-sm-flex align-items-center justify-content-between mb-5">
+          
+          
         </div>
 
         <!-- Row -->
         <div class="row">
             <!-- Data Pasien -->
             <div class="col-lg-12">
-
-                <form wire:submit.prevent="simpanPendaftaran">
+                <form wire:submit.prevent="simpanPendaftaran" class="p-4 shadow rounded bg-white border">
                     @csrf
-                    <div class="mb-3">
-                        <label for="nik" class="form-label">NIK Pasien</label>
-                        <input type="text" class="form-control" wire:model.lazy="nik" maxlength="16">
-                        @error('nik') <span class="text-danger">{{ $message }}</span> @enderror
+                    <h4 class="text-center mb-4 text-success fw-bold">Formulir Pendaftaran Pasien</h4>
+                    <div class="row">
+                        <!-- Kolom Kiri -->
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="nik" class="form-label fw-bold text-dark">NIK Pasien</label>
+                                <input type="text" class="form-control border-success" wire:model.lazy="nik" maxlength="16" placeholder="Masukkan NIK">
+                                @error('nik') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="tanggal_lahir" class="form-label fw-bold text-dark">Tanggal Lahir</label>
+                                <input type="date" class="form-control border-success" wire:model.lazy="tanggal_lahir">
+                                @error('tanggal_lahir') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="nama" class="form-label fw-bold text-dark">Nama Pasien</label>
+                                <input type="text" class="form-control border-success" wire:model.lazy="nama" placeholder="Masukkan Nama">
+                                @error('nama') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="jenis_kelamin" class="form-label fw-bold text-dark">Jenis Kelamin</label>
+                                <select class="form-control border-success" wire:model.lazy="jenis_kelamin">
+                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    <option value="L">Laki-Laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                                @error('jenis_kelamin') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+            
+                        <!-- Kolom Kanan -->
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="no_hp" class="form-label fw-bold text-dark">No. HP</label>
+                                <input type="text" class="form-control border-success" wire:model.lazy="no_hp" placeholder="Masukkan No. HP">
+                                @error('no_hp') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_poli" class="form-label fw-bold text-dark">Poli Tujuan</label>
+                                <select class="form-control border-success" wire:model.lazy="id_poli">
+                                    <option value="">-- Pilih Poli --</option>
+                                    @foreach ($poli_list as $poli)
+                                        <option value="{{ $poli->id_poli }}">{{ $poli->nama_poli }}</option>
+                                    @endforeach
+                                </select>
+                                @error('id_poli') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="alamat" class="form-label fw-bold text-dark">Alamat</label>
+                                <textarea class="form-control border-success" wire:model.lazy="alamat" placeholder="Masukkan Alamat" rows="3"></textarea>
+                                @error('alamat') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                        <input type="date" class="form-control" wire:model.lazy="tanggal_lahir">
-                        @error('tanggal_lahir') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label for="nama" class="form-label">Nama Pasien</label>
-                        <input type="text" class="form-control" wire:model.lazy="nama"
-                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}>
-                        @error('nama') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
-                        <select class="form-control" wire:model.lazy="jenis_kelamin"
-                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}>
-                            <option value="">-- Pilih Jenis Kelamin --</option>
-                            <option value="L">Laki-Laki</option>
-                            <option value="P">Perempuan</option>
-                        </select>
-                        @error('jenis_kelamin') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="alamat" class="form-label">Alamat</label>
-                        <textarea class="form-control" wire:model.lazy="alamat"
-                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}></textarea>
-                        @error('alamat') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="no_hp" class="form-label">No. HP</label>
-                        <input type="text" class="form-control" wire:model.lazy="no_hp"
-                            {{ $this->nik && $this->tanggal_lahir ? '' : '' }}>
-                        @error('no_hp') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_poli" class="form-label">Poli Tujuan</label>
-                        <select class="form-control" wire:model.lazy="id_poli">
-                            <option value="">-- Pilih Poli --</option>
-                            @foreach ($poli_list as $poli)
-                            <option value="{{ $poli->id_poli }}">{{ $poli->nama_poli }}</option>
-                            @endforeach
-                        </select>
-                        @error('id_poli') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Daftar</button>
+            
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-success btn-lg shadow w-100">Daftar</button>
                     </div>
                 </form>
-                <!-- </div>
-                </div> -->
             </div>
+            
+            
+            
         </div>
     </div>
 </div>

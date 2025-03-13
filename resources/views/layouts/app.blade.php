@@ -97,13 +97,21 @@
                     <span>Data Dokter</span>
                 </a>
             </li>
+
+            <li class="nav-item {{ request()->routeIs('pemeriksaan') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('pemeriksaan') }}">
+                    <i class="fas fa-file-word"></i>
+                    <span>Data Pemeriksaan</span>
+                </a>
+            </li>
             
-            <li class="nav-item">
+            
+            {{-- <li class="nav-item">
                 <a class="nav-link" href="{{ route('janjitemu') }}">
                     <i class="fas fa-file-word"></i>
                     <span>Data Janji Temu</span>
                 </a>
-            </li>
+            </li> --}}
             
             
 

@@ -174,25 +174,26 @@ Menyimpan daftar obat yang tersedia di farmasi.
 
 Menyimpan resep obat yang diberikan oleh dokter tambahakan id_pendaftaran
 
-| Nama Kolom          | Tipe Data                                | Keterangan                 |
-| ------------------- | ---------------------------------------- | -------------------------- |
-| `id_resep`          | INT (PK, AI)                             | ID unik resep              |
-| `id_pemeriksaan`    | INT (FK)                                 | Referensi ke `pemeriksaan` |
-| `status_resep`      | ENUM ('Menunggu', 'Diproses', 'Selesai') | Status resep               |
-| `total_harga_resep` | DECIMAL(10,2)                            | Total harga resep          |
+| Nama Kolom       | Tipe Data                                | Keterangan                 |
+| ---------------- | ---------------------------------------- | -------------------------- |
+| `id_resep`       | INT (PK, AI)                             | ID unik resep              |
+| `id_pendaftaran` | INT (FK)                                 | Referensi ke `pendaftaran` |
+| `id_pemeriksaan` | INT (FK)                                 | Referensi ke `pemeriksaan` |
+| `status_resep`   | ENUM ('Menunggu', 'Diproses', 'Selesai') | Status resep               |
 
 ## 📌 8. Tabel `tb_resep_detail`
 
 Menyimpan detail obat yang diresepkan dalam satu resep.
 
-| Nama Kolom                  | Tipe Data    | Keterangan                 |
-| --------------------------- | ------------ | -------------------------- |
-| `id_resep_detail`           | INT (PK, AI) | ID unik                    |
-| `id_resep`                  | INT (FK)     | Referensi ke `resep`       |
-| `id_obat`                   | INT (FK)     | Referensi ke `obat`        |
-| `dosis_resep_detail`        | VARCHAR(50)  | Dosis obat                 |
-| `jumlah_resep_detail`       | INT          | Jumlah obat yang diberikan |
-| `aturan_pakai_resep_detail` | TEXT         | Aturan pemakaian obat      |
+| Nama Kolom                  | Tipe Data     | Keterangan                 |
+| --------------------------- | ------------- | -------------------------- |
+| `id_resep_detail`           | INT (PK, AI)  | ID unik                    |
+| `id_resep`                  | INT (FK)      | Referensi ke `resep`       |
+| `id_obat`                   | INT (FK)      | Referensi ke `obat`        |
+| `total_harga_resep`         | DECIMAL(10,2) | Total harga resep          |
+| `dosis_resep_detail`        | VARCHAR(50)   | Dosis obat                 |
+| `jumlah_resep_detail`       | INT           | Jumlah obat yang diberikan |
+| `aturan_pakai_resep_detail` | TEXT          | Aturan pemakaian obat      |
 
 ## 📌 9. Tabel `tb_transaksi`
 
