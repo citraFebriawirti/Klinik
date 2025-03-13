@@ -29,12 +29,6 @@ class PemeriksaanPasien extends Component
     public $is_racik = false;
 
     public $isOpen = false;
-    public $isDetailOpen = false; // Untuk modal detail pemeriksaan
-    public $selectedPemeriksaan = null; // Data pemeriksaan yang dipilih untuk dilihat
-
-    // Properti untuk filter dan pencarian
-    public $search = ''; // Untuk pencarian nama, NIK, atau ID pendaftaran
-    public $statusFilter = ''; // Untuk filter status (kosong berarti semua)
 
     public function mount()
     {
@@ -44,63 +38,19 @@ class PemeriksaanPasien extends Component
 
     public function ambilPasien()
     {
-        $query = Pendaftaran::with('pasien', 'poli', 'pemeriksaan.resep.details.obat');
-
-        // Pencarian berdasarkan nama, NIK, atau ID pendaftaran
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('id_pendaftaran', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('pasien', function ($q) {
-                        $q->where('nama_pasien', 'like', '%' . $this->search . '%')
-                            ->orWhere('nik_pasien', 'like', '%' . $this->search . '%');
-                    });
-            });
-        }
-
-        // Filter berdasarkan status
-        if ($this->statusFilter) {
-            $query->where('status_pendaftaran', $this->statusFilter);
-        }
-
-        $this->daftarPasien = $query->get();
-    }
-
-    // Update daftar pasien ketika pencarian atau filter berubah
-    public function updatedSearch()
-    {
-        $this->ambilPasien();
-    }
-
-    public function updatedStatusFilter()
-    {
-        $this->ambilPasien();
+        $this->daftarPasien = Pendaftaran::where('status_pendaftaran', 'Menunggu')
+            ->with('pasien', 'poli')
+            ->get();
     }
 
     public function pilihPasien($id)
     {
         $pendaftaran = Pendaftaran::findOrFail($id);
-        if ($pendaftaran->status_pendaftaran !== 'Menunggu') {
-            $this->emit('showAlert', [
-                'title' => 'Tidak Dapat Memeriksa!',
-                'text' => 'Pasien ini sudah selesai diperiksa.',
-                'icon' => 'warning'
-            ]);
-            return;
-        }
-
         $this->id_pendaftaran = $pendaftaran->id_pendaftaran;
         $this->dokterList = Dokter::where('id_poli', $pendaftaran->id_poli)->get();
 
         $this->resetFields();
         $this->openModal();
-    }
-
-    public function lihatDetail($id_pendaftaran)
-    {
-        $pendaftaran = Pendaftaran::with('pemeriksaan.resep.details.obat')->findOrFail($id_pendaftaran);
-        $this->selectedPemeriksaan = $pendaftaran->pemeriksaan;
-        $this->isDetailOpen = true;
-        $this->emit('openDetailModal');
     }
 
     public function openModal()
@@ -112,7 +62,6 @@ class PemeriksaanPasien extends Component
     public function closeModal()
     {
         $this->isOpen = false;
-        $this->isDetailOpen = false;
         $this->emit('closeModal');
     }
 
@@ -127,7 +76,6 @@ class PemeriksaanPasien extends Component
         $this->jumlah = '';
         $this->aturan_pakai = '';
         $this->is_racik = false;
-        $this->selectedPemeriksaan = null;
     }
 
     public function tambahItemResep()
@@ -188,7 +136,7 @@ class PemeriksaanPasien extends Component
             ]);
 
             $totalHarga = 0;
-            $namaRacik = $this->is_racik ? "RACK-" . str_pad($resep->id_resep, 2, '0', STR_PAD_LEFT) : null;
+            $namaRacik = $this->is_racik ? "RACK-" . str_pad($resep->id_resep, 2, '0', STR_PAD_LEFT) : null; // Nama racik otomatis, misal RACK-01
             foreach ($this->resepItems as $item) {
                 $obat = Obat::find($item['id_obat']);
                 $subtotal = $obat->harga_obat * $item['jumlah'];

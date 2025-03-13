@@ -37,15 +37,103 @@
                 </style>
             </head>
             <body>
-                <h2>Struk Pendaftaran Pasien</h2>
-                <div class="content">
-                    <p><strong>NIK:</strong> ${event.detail.nik}</p>
-                    <p><strong>Nama:</strong> ${event.detail.nama}</p>
-                    <p><strong>Poli Tujuan:</strong> ${event.detail.poli}</p>
-                </div>
-                <div class="footer">
-                    <p>Terima kasih telah mendaftar di klinik kami!</p>
-                </div>
+                <div style="
+    font-family: Arial, sans-serif;
+    border: 2px solid #4CAF50;
+    padding: 20px;
+    width: 350px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: #f9f9f9;
+">
+
+    <!-- Header -->
+    <div style="
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #4CAF50;
+        padding-bottom: 10px;
+    ">
+        <h2 style="color: #4CAF50; margin: 0;">Struk Pendaftaran Pasien</h2>
+        <p style="font-size: 14px; color: #555;">
+            Tanggal Mendaftar: <strong>${event.detail.tanggal_daftar_pendaftaran}</strong>
+        </p>
+    </div>
+
+    <!-- Isi Struk -->
+    <table style="
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    ">
+        <tr>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #333;
+            "><strong>ID Pendaftaran</strong></td>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #555;
+                text-align: right;
+            ">${event.detail.id_pendaftaran}</td>
+        </tr>
+        <tr>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #333;
+            "><strong>NIK</strong></td>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #555;
+                text-align: right;
+            ">${event.detail.nik}</td>
+        </tr>
+        <tr>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #333;
+            "><strong>Nama</strong></td>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #555;
+                text-align: right;
+            ">${event.detail.nama}</td>
+        </tr>
+        <tr>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #333;
+            "><strong>Poli Tujuan</strong></td>
+            <td style="
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                color: #555;
+                text-align: right;
+            ">${event.detail.poli}</td>
+        </tr>
+    </table>
+
+    <!-- Footer -->
+    <div style="
+        text-align: center;
+        padding-top: 10px;
+        border-top: 2px solid #4CAF50;
+        color: #555;
+        font-size: 14px;
+    ">
+        <p>Terima kasih telah mendaftar di klinik kami!</p>
+    </div>
+</div>
+
+
                 <script>
                     window.print();
                 <\/script>
