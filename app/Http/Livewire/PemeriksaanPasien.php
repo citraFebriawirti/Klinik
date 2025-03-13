@@ -44,7 +44,7 @@ class PemeriksaanPasien extends Component
     public function openModal()
     {
         $this->isOpen = true;
-        $this->emit('openModal'); // Menggunakan emit untuk Livewire 2.x
+        $this->emit('openModal');
     }
 
     public function closeModal()
@@ -63,7 +63,7 @@ class PemeriksaanPasien extends Component
     public function simpanPemeriksaan()
     {
         $this->validate([
-            'id_dokter' => 'required|exists:dokters,id_dokter',
+            'id_dokter' => 'required|exists:tb_dokter,id_dokter',
             'diagnosa' => 'required|max:255',
             'catatan' => 'nullable|max:500',
         ]);
@@ -83,7 +83,7 @@ class PemeriksaanPasien extends Component
         $this->resetFields();
         $this->ambilPasien();
 
-        $this->emit('showAlert', [
+        $this->dispatchBrowserEvent('showAlert', [
             'title' => 'Pemeriksaan Berhasil!',
             'text' => 'Data pemeriksaan telah disimpan.',
             'icon' => 'success'
