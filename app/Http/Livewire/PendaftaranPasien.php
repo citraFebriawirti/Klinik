@@ -109,9 +109,12 @@ class PendaftaranPasien extends Component
 
         // Tunggu sejenak lalu cetak struk
         $this->dispatchBrowserEvent('cetakStruk', [
+            'id_pendaftaran' => Pendaftaran::latest()->first()->id_pendaftaran,
             'nik' => $pasien->nik_pasien,
             'nama' => $pasien->nama_pasien,
-            'poli' => $namaPoli
+            'poli' => $namaPoli,
+            'tanggal_daftar_pendaftaran' => now()->format('d/m/Y H:i:s'),
+
         ]);
     }
 
