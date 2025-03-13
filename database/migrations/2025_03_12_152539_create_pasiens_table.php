@@ -19,11 +19,12 @@ class CreatePasiensTable extends Migration
             $table->string('nik_pasien', 16)->unique();
             $table->date('tanggallahir_pasien');
             $table->enum('jenis_kelamin_pasien', ['L', 'P']);
-            $table->text('alamat_pasien');
-            $table->string('no_hp_pasien', 15);
+            $table->text('alamat_pasien')->nullable();
+            $table->string('no_hp_pasien', 15)->nullable();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
@@ -33,6 +34,5 @@ class CreatePasiensTable extends Migration
     public function down()
     {
         Schema::dropIfExists('tb_pasien');
-        Schema::dropIfExists('pasien');
     }
 }
