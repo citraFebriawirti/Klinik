@@ -34,3 +34,7 @@ Route::get('/janjitemu', function () {
 Route::get('/buku', function () {
     return view('buku.index');
 })->name('buku');
+
+Route::get('/pendaftaran', function () {
+    return view('pendaftaran-pasien.index');
+})->name('pendaftaran');
