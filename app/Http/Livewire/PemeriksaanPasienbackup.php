@@ -136,7 +136,6 @@ class PemeriksaanPasien extends Component
             ]);
 
             $totalHarga = 0;
-            $namaRacik = $this->is_racik ? "RACK-" . str_pad($resep->id_resep, 2, '0', STR_PAD_LEFT) : null; // Nama racik otomatis, misal RACK-01
             foreach ($this->resepItems as $item) {
                 $obat = Obat::find($item['id_obat']);
                 $subtotal = $obat->harga_obat * $item['jumlah'];
@@ -145,8 +144,6 @@ class PemeriksaanPasien extends Component
                 ResepDetail::create([
                     'id_resep' => $resep->id_resep,
                     'id_obat' => $item['id_obat'],
-                    'is_racik' => $item['is_racik'],
-                    'nama_racik' => $item['is_racik'] ? $namaRacik : null,
                     'dosis_resep_detail' => $item['dosis'],
                     'jumlah_resep_detail' => $item['jumlah'],
                     'aturan_pakai_resep_detail' => $item['aturan_pakai'],

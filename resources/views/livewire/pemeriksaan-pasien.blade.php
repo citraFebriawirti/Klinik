@@ -1,9 +1,8 @@
 <div>
     @push('scripts')
     <script>
-        // Event listener untuk menampilkan alert
         window.addEventListener('showAlert', event => {
-            console.log('Event showAlert diterima:', event.detail); // Debug
+            console.log('Event showAlert diterima:', event.detail);
             Swal.fire({
                 title: event.detail.title,
                 text: event.detail.text,
@@ -12,10 +11,9 @@
             });
         });
 
-        // Event listener untuk membuka modal
         document.addEventListener('DOMContentLoaded', function() {
             window.addEventListener('openModal', function() {
-                console.log('Event openModal diterima'); // Debug
+                console.log('Event openModal diterima');
                 const modalElement = document.getElementById('modalPemeriksaan');
                 if (modalElement) {
                     const modal = new bootstrap.Modal(modalElement);
@@ -26,7 +24,7 @@
             });
 
             window.addEventListener('closeModal', function() {
-                console.log('Event closeModal diterima'); // Debug
+                console.log('Event closeModal diterima');
                 const modalElement = document.getElementById('modalPemeriksaan');
                 if (modalElement) {
                     const modal = bootstrap.Modal.getInstance(modalElement);
@@ -47,15 +45,14 @@
             </ol>
         </div>
 
-        <!-- Row -->
         <div class="row">
-            <!-- Data Pasien untuk Pemeriksaan -->
             <div class="col-lg-12">
                 <div class="card mb-4">
-
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Data Pasien untuk Pemeriksaan</h6>
+                    </div>
 
                     <div class="p-3">
-                        <!-- Tabel Data -->
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -93,39 +90,106 @@
             </div>
         </div>
 
-        <!-- Modal -->
         @if($isOpen)
         <div class="modal fade show d-block" id="modalPemeriksaan" tabindex="-1" aria-labelledby="modalPemeriksaanLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <form wire:submit.prevent="simpanPemeriksaan">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modalPemeriksaanLabel">Pemeriksaan Pasien</h5>
+                            <button type="button" class="btn-close" wire:click="closeModal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">ID Pendaftaran</label>
-                                <input type="text" class="form-control" value="{{ $id_pendaftaran }}" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Dokter</label>
-                                <select wire:model="id_dokter" class="form-control">
-                                    <option value="">Pilih Dokter</option>
-                                    @foreach ($dokterList as $dokter)
-                                    <option value="{{ $dokter->id_dokter }}">{{ $dokter->nama_dokter }} - {{ $dokter->spesialisasi_dokter }}</option>
-                                    @endforeach
-                                </select>
-                                @error('id_dokter') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Diagnosa</label>
-                                <input type="text" class="form-control" wire:model="diagnosa">
-                                @error('diagnosa') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Catatan</label>
-                                <textarea class="form-control" wire:model="catatan"></textarea>
-                                @error('catatan') <span class="text-danger">{{ $message }}</span> @enderror
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">ID Pendaftaran</label>
+                                        <input type="text" class="form-control" value="{{ $id_pendaftaran }}" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Dokter</label>
+                                        <select wire:model="id_dokter" class="form-control">
+                                            <option value="">Pilih Dokter</option>
+                                            @foreach ($dokterList as $dokter)
+                                            <option value="{{ $dokter->id_dokter }}">{{ $dokter->nama_dokter }} - {{ $dokter->spesialisasi_dokter }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_dokter') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Diagnosa</label>
+                                        <input type="text" class="form-control" wire:model="diagnosa">
+                                        @error('diagnosa') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Catatan</label>
+                                        <textarea class="form-control" wire:model="catatan"></textarea>
+                                        @error('catatan') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="mb-3">Resep Obat</h6>
+                                    <div class="mb-3">
+                                        <label class="form-label">Obat</label>
+                                        <select wire:model="id_obat" class="form-control">
+                                            <option value="">Pilih Obat</option>
+                                            @foreach ($obatList as $obat)
+                                            <option value="{{ $obat->id_obat }}">{{ $obat->nama_obat }} ({{ $obat->jenis_obat }})</option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_obat') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Dosis</label>
+                                        <input type="text" class="form-control" wire:model="dosis" placeholder="Contoh: 1x sehari">
+                                        @error('dosis') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Jumlah</label>
+                                        <input type="number" class="form-control" wire:model="jumlah" min="1">
+                                        @error('jumlah') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Aturan Pakai</label>
+                                        <input type="text" class="form-control" wire:model="aturan_pakai" placeholder="Contoh: Setelah makan">
+                                        @error('aturan_pakai') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" wire:model="is_racik"> Racik
+                                        </label>
+                                    </div>
+                                    <button type="button" wire:click="tambahItemResep" class="btn btn-primary btn-sm">Tambah ke Resep</button>
+
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mt-3">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Obat</th>
+                                                    <th>Dosis</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Aturan Pakai</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($resepItems as $index => $item)
+                                                <tr>
+                                                    <td>{{ $item['nama_obat'] }}</td>
+                                                    <td>{{ $item['dosis'] }}</td>
+                                                    <td>{{ $item['jumlah'] }}</td>
+                                                    <td>{{ $item['aturan_pakai'] }}</td>
+                                                    <td>
+                                                        <button type="button" wire:click="hapusItemResep({{ $index }})" class="btn btn-danger btn-sm">Hapus</button>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
