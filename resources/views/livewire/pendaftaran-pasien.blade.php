@@ -160,18 +160,34 @@
                     @csrf
                     <h4 class="text-center mb-4 fw-bold" style="color: #b99044">Formulir Pendaftaran Pasien</h4>
                     <div class="row">
-                        <!-- Kolom Kiri -->
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                             <div class="mb-3">
                                 <label for="nik" class="form-label fw-bold text-dark">NIK Pasien</label>
                                 <input type="text" class="form-control" style="border-color: #b99044" wire:model.lazy="nik" maxlength="16" placeholder="Masukkan NIK">
                                 @error('nik') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
                             <div class="mb-3">
                                 <label for="tanggal_lahir" class="form-label fw-bold text-dark">Tanggal Lahir</label>
                                 <input type="date" class="form-control" style="border-color: #b99044" wire:model.lazy="tanggal_lahir">
                                 @error('tanggal_lahir') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <!-- Kolom Kiri -->
+                        <div class="col-lg-6">
+                           
+                            <div class="mb-3">
+                                <label for="no_hp" class="form-label fw-bold text-dark">No. HP</label>
+                                <input type="text" class="form-control" style="border-color: #b99044" wire:model.lazy="no_hp" placeholder="Masukkan No. HP">
+                                @error('no_hp') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                           
                             <div class="mb-3">
                                 <label for="nama" class="form-label fw-bold text-dark">Nama Pasien</label>
                                 <input type="text" class="form-control" style="border-color: #b99044" wire:model.lazy="nama" placeholder="Masukkan Nama">
@@ -181,11 +197,8 @@
                 
                         <!-- Kolom Kanan -->
                         <div class="col-lg-6">
-                            <div class="mb-3">
-                                <label for="no_hp" class="form-label fw-bold text-dark">No. HP</label>
-                                <input type="text" class="form-control" style="border-color: #b99044" wire:model.lazy="no_hp" placeholder="Masukkan No. HP">
-                                @error('no_hp') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
+                           
+                            
                             <div class="mb-3">
                                 <label for="jenis_kelamin" class="form-label fw-bold text-dark">Jenis Kelamin</label>
                                 <select class="form-control" style="border-color: #b99044" wire:model.lazy="jenis_kelamin">
