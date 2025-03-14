@@ -3,7 +3,8 @@
 namespace App\Http\Livewire;
 
 use App\Models\Resep;
-use App\Models\xPengambilanObat;
+use App\Models\XPengambilanObat;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,19 +13,24 @@ class FarmasiResep extends Component
     use WithPagination;
 
     public $search = '';
+    public $isOpen = false; // Ubah ke boolean untuk kontrol modal
     public $statusFilter = '';
     public $selectedResepId = null;
-    protected $resepList;
     protected $paginationTheme = 'bootstrap';
+    protected $listeners = [
+        'refreshComponent' => '$refresh',
+        'closeModal' => 'closeModal' // Pastikan listener ini ada
+    ];
 
     public function mount()
     {
-        $this->ambilResep();
+        $this->resetPage();
     }
 
-    public function ambilResep()
+    private function getResepQuery()
     {
-        $query = Resep::with(['pemeriksaan.pendaftaran.pasien', 'details.obat', 'transaksi', 'pengambilanObat']);
+        $query = Resep::with(['pemeriksaan.pendaftaran.pasien', 'details.obat', 'transaksi', 'pengambilanObat'])
+            ->orderBy('created_at', 'desc');
 
         if ($this->statusFilter) {
             $query->where('status_resep', $this->statusFilter);
@@ -36,70 +42,80 @@ class FarmasiResep extends Component
             });
         }
 
-        $this->resepList = $query->paginate(10);
+        return $query;
     }
-
 
     public function updatedSearch()
     {
         $this->resetPage();
-        $this->ambilResep();
     }
 
     public function updatedStatusFilter()
     {
         $this->resetPage();
-        $this->ambilResep();
+    }
+
+    public function openModal()
+    {
+        $this->isOpen = true;
+    }
+
+    public function closeModal()
+    {
+        $this->isOpen = false;
+        $this->selectedResepId = null;
     }
 
     public function prosesResep($id)
     {
-        $resep = Resep::findOrFail($id);
-        if ($resep->status_resep === 'Menunggu') {
+        try {
+            $resep = Resep::findOrFail($id);
+            if ($resep->status_resep !== 'Menunggu') {
+                throw new \Exception('Status resep tidak valid untuk diproses.');
+            }
             $resep->update(['status_resep' => 'Diproses']);
-            $this->emit('showAlert', [
-                'title' => 'Berhasil!',
-                'text' => 'Resep telah diproses dan siap untuk pembayaran.',
-                'icon' => 'success'
-            ]);
+            $this->emit('showAlert', ['title' => 'Berhasil!', 'text' => 'Resep telah diproses.', 'icon' => 'success']);
+        } catch (\Exception $e) {
+            $this->emit('showAlert', ['title' => 'Gagal!', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
-        $this->ambilResep();
     }
 
     public function selesaikanResep($id)
     {
-        $resep = Resep::findOrFail($id);
-        if ($resep->status_resep === 'Diproses' && $resep->transaksi && $resep->transaksi->status_transaksi === 'Lunas') {
-            $resep->update(['status_resep' => 'Selesai']);
-            xPengambilanObat::where('id_resep', $id)->update([
-                'status_pengambilan_obat' => 'Diambil',
-                'tanggal_ambil_pengambilan_obat' => now(),
-            ]);
-            $this->emit('showAlert', [
-                'title' => 'Berhasil!',
-                'text' => 'Resep telah selesai dan obat telah diambil pasien.',
-                'icon' => 'success'
-            ]);
-        } else {
-            $this->emit('showAlert', [
-                'title' => 'Gagal!',
-                'text' => 'Pembayaran belum lunas, obat belum bisa diselesaikan.',
-                'icon' => 'error'
-            ]);
+        try {
+            $resep = Resep::with('transaksi')->findOrFail($id);
+            if ($resep->status_resep !== 'Diproses') {
+                throw new \Exception('Resep belum diproses.');
+            }
+            if (!$resep->transaksi || $resep->transaksi->status_transaksi !== 'Lunas') {
+                throw new \Exception('Pembayaran belum lunas.');
+            }
+            DB::transaction(function () use ($id, $resep) {
+                $resep->update(['status_resep' => 'Selesai']);
+                XPengambilanObat::updateOrCreate(
+                    ['id_resep' => $id],
+                    ['status_pengambilan_obat' => 'Diambil', 'tanggal_ambil_pengambilan_obat' => now()]
+                );
+            });
+            $this->emit('showAlert', ['title' => 'Berhasil!', 'text' => 'Resep telah selesai.', 'icon' => 'success']);
+        } catch (\Exception $e) {
+            $this->emit('showAlert', ['title' => 'Gagal!', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
-        $this->ambilResep();
     }
 
     public function showStruk($id)
     {
-        $this->selectedResepId = $id; // Set ID resep yang dipilih untuk ditampilkan di modal
+        $this->selectedResepId = $id;
+        $this->openModal(); // Buka modal saat tombol diklik
     }
 
     public function render()
     {
         return view('livewire.farmasi-resep', [
-            'resepList' => $this->resepList,
-            'selectedResep' => $this->selectedResepId ? Resep::with(['details.obat', 'pemeriksaan.pendaftaran.pasien'])->find($this->selectedResepId) : null,
+            'resepList' => $this->getResepQuery()->paginate(10),
+            'selectedResep' => $this->selectedResepId
+                ? Resep::with(['details.obat', 'pemeriksaan.pendaftaran.pasien'])->findOrFail($this->selectedResepId)
+                : null,
         ]);
     }
 }

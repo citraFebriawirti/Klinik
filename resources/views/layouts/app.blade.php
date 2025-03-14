@@ -141,6 +141,18 @@
                     <span>Data Pemeriksaan</span>
                 </a>
             </li>
+             <li class="nav-item {{ request()->routeIs('farmasi.resep') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('farmasi.resep') }}">
+                    <i class="fas fa-file-word"></i>
+                    <span>Data Farmasi Obat</span>
+                </a>
+            </li>
+            <li class="nav-item {{ request()->routeIs('kasir.transaksi') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('kasir.transaksi') }}">
+                    <i class="fas fa-file-word"></i>
+                    <span>Data Pembayaran Kasir</span>
+                </a>
+            </li>
 
           
             
