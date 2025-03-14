@@ -42,7 +42,14 @@
                 <div class="card mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Data Obat</h6>
-                        <button wire:click="create()" class="btn btn-primary mb-3">Tambah Obat +</button>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex mb-3 mr-5">
+                                <input type="text" class="form-control me-2" placeholder="Cari..." wire:model.debounce.500ms="searchTerm">
+                                <button wire:click="resetFilter" class="btn btn-warning ml-1">Reset</button>
+                            </div>
+                            <button wire:click="create()" class="btn btn-primary mb-3">Tambah Obat +</button>
+                        </div>
+                      
                     </div>
 
                     <div class="p-3">

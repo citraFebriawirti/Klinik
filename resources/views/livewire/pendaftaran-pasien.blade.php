@@ -39,7 +39,7 @@
             <body>
                 <div style="
     font-family: Arial, sans-serif;
-    border: 2px solid #4CAF50;
+    border: 2px solid #b99044;
     padding: 20px;
     width: 350px;
     margin: 0 auto;
@@ -52,10 +52,10 @@
     <div style="
         text-align: center;
         margin-bottom: 20px;
-        border-bottom: 2px solid #4CAF50;
+        border-bottom: 2px solid #b99044;
         padding-bottom: 10px;
     ">
-        <h2 style="color: #4CAF50; margin: 0;">Struk Pendaftaran Pasien</h2>
+        <h2 style="color: #b99044; margin: 0;">Struk Pendaftaran Pasien</h2>
         <p style="font-size: 14px; color: #555;">
             Tanggal Mendaftar: <strong>${event.detail.tanggal_daftar_pendaftaran}</strong>
         </p>
@@ -125,7 +125,7 @@
     <div style="
         text-align: center;
         padding-top: 10px;
-        border-top: 2px solid #4CAF50;
+        border-top: 2px solid #b99044;
         color: #555;
         font-size: 14px;
     ">
@@ -158,39 +158,37 @@
             <div class="col-lg-12">
                 <form wire:submit.prevent="simpanPendaftaran" class="p-4 shadow rounded bg-white border">
                     @csrf
-                    <h4 class="text-center mb-4 text-success fw-bold">Formulir Pendaftaran Pasien</h4>
+                    <h4 class="text-center mb-4 fw-bold" style="color: #b99044">Formulir Pendaftaran Pasien</h4>
                     <div class="row">
                         <!-- Kolom Kiri -->
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label for="nik" class="form-label fw-bold text-dark">NIK Pasien</label>
-                                <input type="text" class="form-control border-success" wire:model.lazy="nik" maxlength="16" placeholder="Masukkan NIK">
+                                <input type="text" class="form-control" style="border-color: #b99044" wire:model.lazy="nik" maxlength="16" placeholder="Masukkan NIK">
                                 @error('nik') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="mb-3">
                                 <label for="tanggal_lahir" class="form-label fw-bold text-dark">Tanggal Lahir</label>
-                                <input type="date" class="form-control border-success" wire:model.lazy="tanggal_lahir">
+                                <input type="date" class="form-control" style="border-color: #b99044" wire:model.lazy="tanggal_lahir">
                                 @error('tanggal_lahir') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="mb-3">
                                 <label for="nama" class="form-label fw-bold text-dark">Nama Pasien</label>
-                                <input type="text" class="form-control border-success" wire:model.lazy="nama" placeholder="Masukkan Nama">
+                                <input type="text" class="form-control" style="border-color: #b99044" wire:model.lazy="nama" placeholder="Masukkan Nama">
                                 @error('nama') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                           
-                            
                         </div>
-            
+                
                         <!-- Kolom Kanan -->
                         <div class="col-lg-6">
                             <div class="mb-3">
                                 <label for="no_hp" class="form-label fw-bold text-dark">No. HP</label>
-                                <input type="text" class="form-control border-success" wire:model.lazy="no_hp" placeholder="Masukkan No. HP">
+                                <input type="text" class="form-control" style="border-color: #b99044" wire:model.lazy="no_hp" placeholder="Masukkan No. HP">
                                 @error('no_hp') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="mb-3">
                                 <label for="jenis_kelamin" class="form-label fw-bold text-dark">Jenis Kelamin</label>
-                                <select class="form-control border-success" wire:model.lazy="jenis_kelamin">
+                                <select class="form-control" style="border-color: #b99044" wire:model.lazy="jenis_kelamin">
                                     <option value="">-- Pilih Jenis Kelamin --</option>
                                     <option value="L">Laki-Laki</option>
                                     <option value="P">Perempuan</option>
@@ -199,7 +197,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="alamat" class="form-label fw-bold text-dark">Alamat</label>
-                                <textarea class="form-control border-success" wire:model.lazy="alamat" placeholder="Masukkan Alamat" rows="3"></textarea>
+                                <textarea class="form-control" style="border-color: #b99044" wire:model.lazy="alamat" placeholder="Masukkan Alamat" rows="3"></textarea>
                                 @error('alamat') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -208,7 +206,7 @@
                         <div class="col-lg-12">
                             <div class="mb-3">
                                 <label for="id_poli" class="form-label fw-bold text-dark">Poli Tujuan</label>
-                                <select class="form-control border-success" wire:model.lazy="id_poli">
+                                <select class="form-control" style="border-color: #b99044" wire:model.lazy="id_poli">
                                     <option value="">-- Pilih Poli --</option>
                                     @foreach ($poli_list as $poli)
                                         <option value="{{ $poli->id_poli }}">{{ $poli->nama_poli }}</option>
@@ -218,9 +216,9 @@
                             </div>
                         </div>
                     </div>
-            
+                
                     <div class="d-grid gap-2 mt-3">
-                        <button type="submit" class="btn btn-success btn-lg shadow w-100">Daftar</button>
+                        <button type="submit" class="btn btn-lg shadow w-100" style="background-color: #b99044; border-color: #b99044; color: white">Daftar</button>
                     </div>
                 </form>
             </div>

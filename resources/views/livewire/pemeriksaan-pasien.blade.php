@@ -88,9 +88,9 @@
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>ID Pendaftaran</th>
+                                    <tr class="text-center">
+                                        <th style="width: 10px">No</th>
+                                        <th style="width: 10px">ID Pendaftaran</th>
                                         <th>NIK</th>
                                         <th>Nama</th>
                                         <th>Poli</th>
@@ -140,7 +140,7 @@
         <!-- Modal Pemeriksaan -->
         @if($isOpen)
         <div class="modal fade show d-block" id="modalPemeriksaan" tabindex="-1" aria-labelledby="modalPemeriksaanLabel" aria-hidden="true">
-            <div class="modal-dialog  modal-xl modal-dialog-scrollable">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <form wire:submit.prevent="simpanPemeriksaan">
                         <div class="modal-header">
@@ -182,6 +182,19 @@
                                             <input type="checkbox" wire:model="is_racik"> Racik
                                         </label>
                                     </div>
+                                    @if($is_racik && !$nama_racik_aktif)
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Racikan</label>
+                                        <input type="text" class="form-control" wire:model="nama_racik" placeholder="Masukkan nama racikan (contoh: Obat Batuk)">
+                                        @error('nama_racik') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    @elseif($nama_racik_aktif)
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Racikan Aktif</label>
+                                        <input type="text" class="form-control" value="{{ $nama_racik_aktif }}" disabled>
+                                        <button type="button" wire:click="resetNamaRacik" class="btn btn-warning btn-sm mt-2">Ganti Nama Racikan</button>
+                                    </div>
+                                    @endif
                                     <div class="mb-3">
                                         <label class="form-label">Obat</label>
                                         <select wire:model="id_obat" class="form-control">
@@ -207,15 +220,6 @@
                                         <input type="text" class="form-control" wire:model="aturan_pakai" placeholder="Contoh: Setelah makan">
                                         @error('aturan_pakai') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
-                                   
-                                    <!-- Tambahkan input untuk nama racikan jika is_racik true -->
-                                    @if($is_racik)
-                                    <div class="mb-3">
-                                        <label class="form-label">Nama Racikan</label>
-                                        <input type="text" class="form-control" wire:model="nama_racik" placeholder="Masukkan nama racikan (contoh: Obat Batuk)">
-                                        @error('nama_racik') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    @endif
                                     <button type="button" wire:click="tambahItemResep" class="btn btn-primary btn-sm">Tambah ke Resep</button>
                                 </div>
                                 <div class="col-md-4">
@@ -229,6 +233,8 @@
                                         @else
                                         <h6 class="mb-2">Obat Non-Racik</h6>
                                         @endif
+
+                                      
                                         <table class="table table-sm table-bordered">
                                             <thead>
                                                 <tr>
@@ -253,6 +259,9 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
+                                        @if ($namaRacik && $is_racik && $nama_racik_aktif === $namaRacik)
+                                        <button type="button" wire:click="tambahLagiRacikan('{{ $namaRacik }}')" class="btn btn-primary btn-sm mt-2">Sedang menambah Item ke {{ $namaRacik }}</button>
+                                        @endif
                                         @endforeach
                                     </div>
                                 </div>
@@ -276,7 +285,7 @@
                     <div class="modal-header">
                         <h6 class="modal-title" id="modalDetailPemeriksaanLabel">Detail Pemeriksaan</h6>
                         <button type="button" class="btn-close" wire:click="closeModal" aria-label="Close"></button>
-                    </div>
+                    </div> 
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">ID Pendaftaran</label>
