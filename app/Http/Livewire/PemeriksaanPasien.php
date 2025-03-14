@@ -15,14 +15,17 @@ class PemeriksaanPasien extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap'; // Menggunakan Bootstrap untuk pagination
+
+    // Properti untuk data pasien dan pemeriksaan
     public $id_pendaftaran;
     public $id_dokter;
     public $diagnosa;
     public $catatan;
-    protected $daftarPasien; // Properti protected untuk menyimpan LengthAwarePaginator
+    protected $daftarPasien; // Ubah menjadi protected karena bertipe LengthAwarePaginator
     public $dokterList = [];
     public $obatList = [];
 
+    // Properti untuk resep
     public $resepItems = [];
     public $id_obat;
     public $dosis;
@@ -30,18 +33,19 @@ class PemeriksaanPasien extends Component
     public $aturan_pakai;
     public $is_racik = false;
     public $nama_racik;
+    public $nama_racik_aktif; // Menyimpan nama racikan yang sedang aktif
 
+    // Properti untuk kontrol UI
     public $isOpen = false;
     public $isDetailOpen = false;
     public $selectedPemeriksaan = null;
-
     public $search = '';
     public $statusFilter = '';
 
     public function mount()
     {
         $this->obatList = Obat::all();
-        $this->ambilPasien(); // Inisialisasi data di mount
+        $this->ambilPasien(); // Inisialisasi data pasien
     }
 
     public function ambilPasien()
@@ -62,7 +66,7 @@ class PemeriksaanPasien extends Component
             $query->where('status_pendaftaran', $this->statusFilter);
         }
 
-        $this->daftarPasien = $query->paginate(5); // Pastikan selalu mengembalikan paginasi
+        $this->daftarPasien = $query->orderBy('created_at', 'desc')->paginate(5);
     }
 
     public function updatedSearch()
@@ -129,6 +133,7 @@ class PemeriksaanPasien extends Component
         $this->aturan_pakai = '';
         $this->is_racik = false;
         $this->nama_racik = '';
+        $this->nama_racik_aktif = null;
         $this->selectedPemeriksaan = null;
     }
 
@@ -139,25 +144,41 @@ class PemeriksaanPasien extends Component
             'dosis' => 'required|string|max:50',
             'jumlah' => 'required|integer|min:1',
             'aturan_pakai' => 'required|string|max:255',
-            'nama_racik' => 'required_if:is_racik,1|string|max:255|nullable',
+            'nama_racik' => $this->is_racik && !$this->nama_racik_aktif ? 'required|string|max:255' : 'nullable',
         ]);
 
         $obat = Obat::find($this->id_obat);
+
+        // Jika racikan dan belum ada nama aktif, set nama_racik_aktif
+        if ($this->is_racik && !$this->nama_racik_aktif) {
+            $this->nama_racik_aktif = $this->nama_racik;
+        }
+
         $this->resepItems[] = [
             'id_obat' => $this->id_obat,
             'nama_obat' => $obat->nama_obat,
             'dosis' => $this->dosis,
             'jumlah' => $this->jumlah,
             'aturan_pakai' => $this->aturan_pakai,
-            'is_racik' => $this->is_racik,
-            'nama_racik' => $this->is_racik ? $this->nama_racik : null,
+            'nama_racik' => $this->is_racik ? $this->nama_racik_aktif : null,
         ];
 
-        $this->id_obat = null;
-        $this->dosis = '';
-        $this->jumlah = '';
-        $this->aturan_pakai = '';
-        $this->is_racik = false;
+        // Reset input kecuali nama_racik_aktif jika racikan
+        $this->reset(['id_obat', 'dosis', 'jumlah', 'aturan_pakai']);
+        if (!$this->is_racik) {
+            $this->nama_racik = '';
+        }
+    }
+
+    public function tambahLagiRacikan($namaRacik)
+    {
+        $this->nama_racik_aktif = $namaRacik;
+        $this->is_racik = true; // Pastikan checkbox racik aktif
+    }
+
+    public function resetNamaRacik()
+    {
+        $this->nama_racik_aktif = null;
         $this->nama_racik = '';
     }
 
@@ -165,6 +186,12 @@ class PemeriksaanPasien extends Component
     {
         unset($this->resepItems[$index]);
         $this->resepItems = array_values($this->resepItems);
+
+        // Jika tidak ada item dengan nama_racik_aktif lagi, reset nama_racik_aktif
+        $racikExists = collect($this->resepItems)->contains('nama_racik', $this->nama_racik_aktif);
+        if (!$racikExists) {
+            $this->resetNamaRacik();
+        }
     }
 
     public function simpanPemeriksaan()
@@ -202,7 +229,7 @@ class PemeriksaanPasien extends Component
                 ResepDetail::create([
                     'id_resep' => $resep->id_resep,
                     'id_obat' => $item['id_obat'],
-                    'is_racik' => $item['is_racik'],
+                    'is_racik' => $item['nama_racik'] ? 1 : 0, // Set is_racik berdasarkan nama_racik
                     'nama_racik' => $item['nama_racik'],
                     'dosis_resep_detail' => $item['dosis'],
                     'jumlah_resep_detail' => $item['jumlah'],
@@ -225,9 +252,9 @@ class PemeriksaanPasien extends Component
 
     public function render()
     {
-        $this->ambilPasien(); // Pastikan data selalu diambil sebelum render
+        $this->ambilPasien(); // Panggil ambilPasien sebelum render untuk memastikan data terbaru
         return view('livewire.pemeriksaan-pasien', [
-            'daftarPasien' => $this->daftarPasien ?? Pendaftaran::paginate(10), // Fallback jika null
+            'daftarPasien' => $this->daftarPasien,
         ]);
     }
 }
