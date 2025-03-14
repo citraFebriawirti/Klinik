@@ -20,4 +20,14 @@ class Resep extends Model
     {
         return $this->hasMany(ResepDetail::class, 'id_resep');
     }
+
+    public function transaksi()
+    {
+        return $this->hasOne(kTransaksi::class, 'id_resep');
+    }
+
+    public function pengambilanObat()
+    {
+        return $this->hasOne(xPengambilanObat::class, 'id_resep');
+    }
 }
