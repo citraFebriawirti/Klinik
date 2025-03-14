@@ -177,15 +177,8 @@
                                 <input type="text" class="form-control border-success" wire:model.lazy="nama" placeholder="Masukkan Nama">
                                 @error('nama') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
-                            <div class="mb-3">
-                                <label for="jenis_kelamin" class="form-label fw-bold text-dark">Jenis Kelamin</label>
-                                <select class="form-control border-success" wire:model.lazy="jenis_kelamin">
-                                    <option value="">-- Pilih Jenis Kelamin --</option>
-                                    <option value="L">Laki-Laki</option>
-                                    <option value="P">Perempuan</option>
-                                </select>
-                                @error('jenis_kelamin') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
+                           
+                            
                         </div>
             
                         <!-- Kolom Kanan -->
@@ -196,6 +189,24 @@
                                 @error('no_hp') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                             <div class="mb-3">
+                                <label for="jenis_kelamin" class="form-label fw-bold text-dark">Jenis Kelamin</label>
+                                <select class="form-control border-success" wire:model.lazy="jenis_kelamin">
+                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    <option value="L">Laki-Laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                                @error('jenis_kelamin') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="alamat" class="form-label fw-bold text-dark">Alamat</label>
+                                <textarea class="form-control border-success" wire:model.lazy="alamat" placeholder="Masukkan Alamat" rows="3"></textarea>
+                                @error('alamat') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="mb-3">
                                 <label for="id_poli" class="form-label fw-bold text-dark">Poli Tujuan</label>
                                 <select class="form-control border-success" wire:model.lazy="id_poli">
                                     <option value="">-- Pilih Poli --</option>
@@ -204,11 +215,6 @@
                                     @endforeach
                                 </select>
                                 @error('id_poli') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label for="alamat" class="form-label fw-bold text-dark">Alamat</label>
-                                <textarea class="form-control border-success" wire:model.lazy="alamat" placeholder="Masukkan Alamat" rows="3"></textarea>
-                                @error('alamat') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>

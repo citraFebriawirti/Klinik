@@ -67,7 +67,7 @@
                                         <td>{{ $o->jenis_obat }}</td>
                                         <td>{{ $o->satuan_obat }}</td>
                                         <td>{{ $o->stok_obat }}</td>
-                                        <td>{{ number_format($o->harga_obat, 0, ',', '.') }}</td>
+                                        <td>Rp. {{ number_format($o->harga_obat, 0, ',', '.') }}</td>
                                         <td class="d-flex">
                                             <button wire:click.prevent="edit({{ $o->id_obat }})" class="btn btn-warning mr-1">Edit</button>
                                             <button wire:click="delete({{ $o->id_obat }})" class="btn btn-danger">Hapus</button>

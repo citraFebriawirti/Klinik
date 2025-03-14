@@ -100,34 +100,37 @@
                                 </thead>
                                 <tbody>
                                     @forelse($daftarPasien as $pasien)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $pasien->id_pendaftaran }}</td>
-                                        <td>{{ $pasien->pasien->nik_pasien }}</td>
-                                        <td>{{ $pasien->pasien->nama_pasien }}</td>
-                                        <td>{{ $pasien->poli->nama_poli }}</td>
-                                        <td>
-                                            @if($pasien->status_pendaftaran == 'Menunggu')
-                                            <span class="badge badge-warning">Menunggu</span>
-                                            @else
-                                            <span class="badge badge-success">Selesai</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($pasien->status_pendaftaran == 'Menunggu')
-                                            <button wire:click="pilihPasien({{ $pasien->id_pendaftaran }})" class="btn btn-info btn-sm">Periksa</button>
-                                            @else
-                                            <button wire:click="lihatDetail({{ $pasien->id_pendaftaran }})" class="btn btn-secondary btn-sm">Lihat Detail</button>
-                                            @endif
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td>{{ $loop->iteration + $daftarPasien->firstItem() - 1 }}</td>
+                                            <td>{{ $pasien->id_pendaftaran }}</td>
+                                            <td>{{ $pasien->pasien->nik_pasien ?? 'N/A' }}</td>
+                                            <td>{{ $pasien->pasien->nama_pasien ?? 'N/A' }}</td>
+                                            <td>{{ $pasien->poli->nama_poli ?? 'N/A' }}</td>
+                                            <td>
+                                                @if($pasien->status_pendaftaran === 'Menunggu')
+                                                    <span class="badge bg-warning text-dark">Menunggu</span>
+                                                @else
+                                                    <span class="badge bg-success">Selesai</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($pasien->status_pendaftaran === 'Menunggu')
+                                                    <button wire:click="pilihPasien({{ $pasien->id_pendaftaran }})" class="btn btn-info btn-sm">Periksa</button>
+                                                @else
+                                                    <button wire:click="lihatDetail({{ $pasien->id_pendaftaran }})" class="btn btn-secondary btn-sm">Lihat Detail</button>
+                                                @endif
+                                            </td>
+                                        </tr>
                                     @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center">Data tidak ditemukan</td>
-                                    </tr>
+                                        <tr>
+                                            <td colspan="7" class="text-center">Data tidak ditemukan</td>
+                                        </tr>
                                     @endforelse
                                 </tbody>
                             </table>
+                            <div class="d-flex justify-content-center mt-5">
+                                {{ $daftarPasien->links() }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -137,7 +140,7 @@
         <!-- Modal Pemeriksaan -->
         @if($isOpen)
         <div class="modal fade show d-block" id="modalPemeriksaan" tabindex="-1" aria-labelledby="modalPemeriksaanLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
+            <div class="modal-dialog  modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <form wire:submit.prevent="simpanPemeriksaan">
                         <div class="modal-header">
@@ -175,6 +178,11 @@
                                 <div class="col-md-4">
                                     <h6 class="mb-3">Resep Obat</h6>
                                     <div class="mb-3">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" wire:model="is_racik"> Racik
+                                        </label>
+                                    </div>
+                                    <div class="mb-3">
                                         <label class="form-label">Obat</label>
                                         <select wire:model="id_obat" class="form-control">
                                             <option value="">Pilih Obat</option>
@@ -199,11 +207,7 @@
                                         <input type="text" class="form-control" wire:model="aturan_pakai" placeholder="Contoh: Setelah makan">
                                         @error('aturan_pakai') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-check-label">
-                                            <input type="checkbox" wire:model="is_racik"> Racik
-                                        </label>
-                                    </div>
+                                   
                                     <!-- Tambahkan input untuk nama racikan jika is_racik true -->
                                     @if($is_racik)
                                     <div class="mb-3">
@@ -267,7 +271,7 @@
         <!-- Modal Detail Pemeriksaan -->
         @if($isDetailOpen && $selectedPemeriksaan)
         <div class="modal fade show d-block" id="modalDetailPemeriksaan" tabindex="-1" aria-labelledby="modalDetailPemeriksaanLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h6 class="modal-title" id="modalDetailPemeriksaanLabel">Detail Pemeriksaan</h6>

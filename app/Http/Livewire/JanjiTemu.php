@@ -68,6 +68,7 @@ class JanjiTemu extends Component
             'janjiTemu' => $query->paginate(5), // Hindari mengambil semua data dengan all()
             'pasiens' => ModelsPasien::all(),
             'dokters' => ModelsDokter::all(),
+
         ]);
     }
 

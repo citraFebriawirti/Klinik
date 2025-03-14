@@ -45,7 +45,7 @@ Route::get('/buku', function () {
     return view('buku.index');
 })->name('buku');
 
-Route::get('/pendaftaran', function () {
+Route::get('/', function () {
     return view('pendaftaran-pasien.index');
 })->name('pendaftaran');
 
