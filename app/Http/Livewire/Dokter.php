@@ -6,10 +6,17 @@ use Livewire\Component;
 use App\Models\Dokter as ModelsDokter;
 use App\Models\Poli as ModelsPoli;
 use Illuminate\Support\Facades\Schema;
+use Livewire\WithPagination;
 
 class Dokter extends Component
 {
-    public $dokter, $id_dokter, $nama_dokter, $id_poli, $spesialisasi_dokter, $no_hp_dokter, $searchTerm;
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+
+    // Ubah menjadi protected
+    protected $dokter;
+
+    public $id_dokter, $nama_dokter, $id_poli, $spesialisasi_dokter, $no_hp_dokter, $searchTerm;
     public $isOpen = 0;
     protected $listeners = ['destroy'];
 
@@ -26,13 +33,15 @@ class Dokter extends Component
             });
         }
 
-        $this->dokter = $query->get();
+        // Simpan hasil paginate ke properti protected
+        $this->dokter = $query->paginate(5);
 
-        $poli = ModelsPoli::all(); // Ambil semua data Poli
+        $poli = ModelsPoli::all();
 
+        // Kembalikan data ke view
         return view('livewire.dokter', [
-            'dokter' => $this->dokter,
-            'poli' => $poli, // Kirim variabel poli ke view
+            'dokter' => $this->dokter, // Kirim data paginasi
+            'poli' => $poli,
         ]);
     }
 
@@ -119,7 +128,6 @@ class Dokter extends Component
     public function destroy($id)
     {
         if (Schema::hasTable('tb_dokter')) {
-
             ModelsDokter::where('id_dokter', $id)->delete();
 
             $this->dispatchBrowserEvent('alert', [

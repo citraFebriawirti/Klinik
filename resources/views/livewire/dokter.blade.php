@@ -88,6 +88,9 @@
                                     
                                 </tbody>
                             </table>
+                            <div class="d-flex justify-content-center mt-5">
+                                {{ $dokter->links() }}
+                            </div>
                         </div>
                     </div>
                 </div>

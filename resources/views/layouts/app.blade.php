@@ -48,6 +48,28 @@
 }
 
     </style>
+
+<style>
+    .modal-body {
+        max-height: 400px; /* Atur sesuai kebutuhan */
+        overflow-y: auto; /* Pastikan scroll muncul */
+    }
+
+    /* Kustomisasi scroll bar */
+    .modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .modal-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .modal-body::-webkit-scrollbar-thumb {
+        background: #0d6efd; /* Warna biru Bootstrap */
+        border-radius: 4px;
+    }
+    .modal-body::-webkit-scrollbar-thumb:hover {
+        background: #0b5ed7;
+    }
+</style>
 </head>
 
 <body id="page-top">
@@ -75,7 +97,10 @@
             </li>
 
 
-
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">
+              Data Master
+            </div>
             <li class="nav-item {{ request()->routeIs('poli') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('poli') }}" >
                     <i class="fas fa-file-word"></i>
@@ -105,6 +130,11 @@
                 </a>
             </li>
 
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">
+              Data Transaksi
+            </div>
+
             <li class="nav-item {{ request()->routeIs('pemeriksaan') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('pemeriksaan') }}">
                     <i class="fas fa-file-word"></i>
@@ -124,12 +154,12 @@
             
             
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link" href="{{ route('buku') }}">
                     <i class="fas fa-file-word"></i>
                     <span>Data Users</span>
                 </a>
-            </li>
+            </li> --}}
            </div>
 
             <hr class="sidebar-divider">
