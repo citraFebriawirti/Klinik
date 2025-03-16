@@ -3,7 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Resep;
-use App\Models\XPengambilanObat;
+use App\Models\XPengambilanObat; // Perbaiki 'xPengambilanObat' menjadi 'XPengambilanObat'
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,13 +13,13 @@ class FarmasiResep extends Component
     use WithPagination;
 
     public $search = '';
-    public $isOpen = false; // Ubah ke boolean untuk kontrol modal
-    public $statusFilter = '';
-    public $selectedResepId = null;
+    public $isOpen = 0; // Bisa diubah menjadi $is_open untuk konvensi snake_case
+    public $statusFilter = ''; // Bisa diubah menjadi $status_filter
+    public $selectedResepId = null; // Bisa diubah menjadi $selected_resep_id
     protected $paginationTheme = 'bootstrap';
     protected $listeners = [
         'refreshComponent' => '$refresh',
-        'closeModal' => 'closeModal' // Pastikan listener ini ada
+        'closeModal' => 'resetSelectedResep'
     ];
 
     public function mount()
@@ -27,7 +27,7 @@ class FarmasiResep extends Component
         $this->resetPage();
     }
 
-    private function getResepQuery()
+    private function getResepQuery() // Bisa diubah menjadi getResepQuery() untuk camelCase
     {
         $query = Resep::with(['pemeriksaan.pendaftaran.pasien', 'details.obat', 'transaksi', 'pengambilanObat'])
             ->orderBy('created_at', 'desc');
@@ -58,25 +58,37 @@ class FarmasiResep extends Component
     public function openModal()
     {
         $this->isOpen = true;
+        $this->emit('openModal');
     }
 
     public function closeModal()
     {
         $this->isOpen = false;
-        $this->selectedResepId = null;
+        $this->emit('closeModal');
     }
 
-    public function prosesResep($id)
+    public function prosesResep($id) // Konsisten dengan camelCase
     {
         try {
             $resep = Resep::findOrFail($id);
+
             if ($resep->status_resep !== 'Menunggu') {
                 throw new \Exception('Status resep tidak valid untuk diproses.');
             }
+
             $resep->update(['status_resep' => 'Diproses']);
-            $this->emit('showAlert', ['title' => 'Berhasil!', 'text' => 'Resep telah diproses.', 'icon' => 'success']);
+
+            $this->emit('showAlert', [
+                'title' => 'Berhasil!',
+                'text' => 'Resep telah diproses dan siap untuk pembayaran.',
+                'icon' => 'success'
+            ]);
         } catch (\Exception $e) {
-            $this->emit('showAlert', ['title' => 'Gagal!', 'text' => $e->getMessage(), 'icon' => 'error']);
+            $this->emit('showAlert', [
+                'title' => 'Gagal!',
+                'text' => $e->getMessage() ?: 'Terjadi kesalahan saat memproses resep.',
+                'icon' => 'error'
+            ]);
         }
     }
 
@@ -84,29 +96,49 @@ class FarmasiResep extends Component
     {
         try {
             $resep = Resep::with('transaksi')->findOrFail($id);
+
             if ($resep->status_resep !== 'Diproses') {
                 throw new \Exception('Resep belum diproses.');
             }
+
             if (!$resep->transaksi || $resep->transaksi->status_transaksi !== 'Lunas') {
-                throw new \Exception('Pembayaran belum lunas.');
+                throw new \Exception('Pembayaran belum lunas, obat belum bisa diselesaikan.');
             }
+
             DB::transaction(function () use ($id, $resep) {
                 $resep->update(['status_resep' => 'Selesai']);
-                XPengambilanObat::updateOrCreate(
+
+                XPengambilanObat::updateOrCreate( // Perbaiki 'xPengambilanObat'
                     ['id_resep' => $id],
-                    ['status_pengambilan_obat' => 'Diambil', 'tanggal_ambil_pengambilan_obat' => now()]
+                    [
+                        'status_pengambilan_obat' => 'Diambil',
+                        'tanggal_ambil_pengambilan_obat' => now(),
+                    ]
                 );
             });
-            $this->emit('showAlert', ['title' => 'Berhasil!', 'text' => 'Resep telah selesai.', 'icon' => 'success']);
+
+            $this->emit('showAlert', [
+                'title' => 'Berhasil!',
+                'text' => 'Resep telah selesai dan obat telah diambil pasien.',
+                'icon' => 'success'
+            ]);
         } catch (\Exception $e) {
-            $this->emit('showAlert', ['title' => 'Gagal!', 'text' => $e->getMessage(), 'icon' => 'error']);
+            $this->emit('showAlert', [
+                'title' => 'Gagal!',
+                'text' => $e->getMessage(),
+                'icon' => 'error'
+            ]);
         }
     }
 
     public function showStruk($id)
     {
         $this->selectedResepId = $id;
-        $this->openModal(); // Buka modal saat tombol diklik
+    }
+
+    public function resetSelectedResep()
+    {
+        $this->selectedResepId = null;
     }
 
     public function render()

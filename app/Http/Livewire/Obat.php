@@ -5,12 +5,13 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use App\Models\Obat as ModelsObat;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class Obat extends Component
 {
     public $obat, $id_obat, $nama_obat, $jenis_obat, $satuan_obat, $stok_obat, $harga_obat, $searchTerm;
     public $isOpen = 0;
-    protected $listeners = ['destroy'];
+    protected $listeners = ['destroy', 'kurangiStokObat']; // Tambahkan listener untuk pengurangan stok
 
     public function mount($id_obat = null)
     {
@@ -73,8 +74,8 @@ class Obat extends Component
             'nama_obat' => 'required|string|max:50',
             'jenis_obat' => 'required|string|max:50',
             'satuan_obat' => 'required|string|max:50',
-            'stok_obat' => 'required|integer',
-            'harga_obat' => 'required|integer',
+            'stok_obat' => 'required|integer|min:0', // Tambahkan validasi min:0 agar stok tidak negatif
+            'harga_obat' => 'required|integer|min:0',
         ]);
 
         ModelsObat::updateOrCreate(['id_obat' => $this->id_obat], [
@@ -97,7 +98,7 @@ class Obat extends Component
 
     public function edit($id_obat)
     {
-        $obat = ModelsObat::where('id_obat', $id_obat)->firstOrFail();
+        $obat = ModelsObat::findOrFail($id_obat); // Gunakan findOrFail untuk keamanan
         $this->id_obat = $id_obat;
         $this->nama_obat = $obat->nama_obat;
         $this->jenis_obat = $obat->jenis_obat;
@@ -128,6 +129,52 @@ class Obat extends Component
                 'text' => 'Data berhasil dihapus',
                 'icon' => 'success'
             ]);
+        }
+    }
+
+    // Method baru untuk mengurangi stok obat berdasarkan detail resep
+    public function kurangiStokObat($resepDetails)
+    {
+        try {
+            $stokErrors = [];
+            foreach ($resepDetails as $detail) {
+                $obat = ModelsObat::findOrFail($detail['id_obat']);
+                $jumlahDiminta = (int) $detail['jumlah'];
+
+                if ($obat->stok_obat < $jumlahDiminta) {
+                    $stokErrors[] = "Stok {$obat->nama_obat} tidak cukup. Tersedia: {$obat->stok_obat}, diminta: {$jumlahDiminta}.";
+                }
+            }
+
+            if (!empty($stokErrors)) {
+                throw new \Exception(implode(' ', $stokErrors));
+            }
+
+            DB::transaction(function () use ($resepDetails) {
+                foreach ($resepDetails as $detail) {
+                    $obat = ModelsObat::findOrFail($detail['id_obat']);
+                    $obat->stok_obat -= (int) $detail['jumlah'];
+                    $obat->save();
+                }
+            });
+
+            $this->dispatchBrowserEvent('alert', [
+                'title' => 'Berhasil!',
+                'text' => 'Stok obat telah diperbarui.',
+                'icon' => 'success'
+            ]);
+
+            // Emit event ke FarmasiResep untuk melanjutkan
+            $this->emitTo('farmasi-resep', 'stokUpdated', true);
+        } catch (\Exception $e) {
+            $this->dispatchBrowserEvent('alert', [
+                'title' => 'Gagal!',
+                'text' => $e->getMessage(),
+                'icon' => 'error'
+            ]);
+
+            // Emit event ke FarmasiResep untuk menghentikan
+            $this->emitTo('farmasi-resep', 'stokUpdated', false);
         }
     }
 }
