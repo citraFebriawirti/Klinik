@@ -100,31 +100,31 @@
                                 </thead>
                                 <tbody>
                                     @forelse($daftarPasien as $pasien)
-                                        <tr>
-                                            <td>{{ $loop->iteration + $daftarPasien->firstItem() - 1 }}</td>
-                                            <td>{{ $pasien->id_pendaftaran }}</td>
-                                            <td>{{ $pasien->pasien->nik_pasien ?? 'N/A' }}</td>
-                                            <td>{{ $pasien->pasien->nama_pasien ?? 'N/A' }}</td>
-                                            <td>{{ $pasien->poli->nama_poli ?? 'N/A' }}</td>
-                                            <td>
-                                                @if($pasien->status_pendaftaran === 'Menunggu')
-                                                    <span class="badge bg-warning text-dark">Menunggu</span>
-                                                @else
-                                                    <span class="badge bg-success">Selesai</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($pasien->status_pendaftaran === 'Menunggu')
-                                                    <button wire:click="pilihPasien({{ $pasien->id_pendaftaran }})" class="btn btn-info btn-sm">Periksa</button>
-                                                @else
-                                                    <button wire:click="lihatDetail({{ $pasien->id_pendaftaran }})" class="btn btn-secondary btn-sm">Lihat Detail</button>
-                                                @endif
-                                            </td>
-                                        </tr>
+                                    <tr>
+                                        <td>{{ $loop->iteration + $daftarPasien->firstItem() - 1 }}</td>
+                                        <td>{{ $pasien->id_pendaftaran }}</td>
+                                        <td>{{ $pasien->pasien->nik_pasien ?? 'N/A' }}</td>
+                                        <td>{{ $pasien->pasien->nama_pasien ?? 'N/A' }}</td>
+                                        <td>{{ $pasien->poli->nama_poli ?? 'N/A' }}</td>
+                                        <td>
+                                            @if($pasien->status_pendaftaran === 'Menunggu')
+                                            <span class="badge bg-warning text-dark">Menunggu</span>
+                                            @else
+                                            <span class="badge bg-success">Selesai</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($pasien->status_pendaftaran === 'Menunggu')
+                                            <button wire:click="pilihPasien({{ $pasien->id_pendaftaran }})" class="btn btn-info btn-sm">Periksa</button>
+                                            @else
+                                            <button wire:click="lihatDetail({{ $pasien->id_pendaftaran }})" class="btn btn-secondary btn-sm">Lihat Detail</button>
+                                            @endif
+                                        </td>
+                                    </tr>
                                     @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center">Data tidak ditemukan</td>
-                                        </tr>
+                                    <tr>
+                                        <td colspan="7" class="text-center">Data tidak ditemukan</td>
+                                    </tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -182,7 +182,9 @@
                                             <input type="checkbox" wire:model="is_racik"> Racik
                                         </label>
                                     </div>
-                                    @if($is_racik && !$nama_racik_aktif)
+
+                                    @if($is_racik)
+                                    @if(!$nama_racik_aktif)
                                     <div class="mb-3">
                                         <label class="form-label">Nama Racikan</label>
                                         <input type="text" class="form-control" wire:model="nama_racik" placeholder="Masukkan nama racikan (contoh: Obat Batuk)">
@@ -195,12 +197,15 @@
                                         <button type="button" wire:click="resetNamaRacik" class="btn btn-warning btn-sm mt-2">Ganti Nama Racikan</button>
                                     </div>
                                     @endif
+                                    @endif
+
+
                                     <div class="mb-3">
                                         <label class="form-label">Obat</label>
                                         <select wire:model="id_obat" class="form-control">
                                             <option value="">Pilih Obat</option>
-                                            @foreach ($obatList as $obat)
-                                            <option value="{{ $obat->id_obat }}">{{ $obat->nama_obat }} ({{ $obat->jenis_obat }})</option>
+                                            @foreach ($filteredObatList as $obat)
+                                            <option value="{{ $obat['id_obat'] }}">{{ $obat['nama_obat'] }} ({{ $obat['jenis_obat'] }})</option>
                                             @endforeach
                                         </select>
                                         @error('id_obat') <span class="text-danger">{{ $message }}</span> @enderror
@@ -233,8 +238,6 @@
                                         @else
                                         <h6 class="mb-2">Obat Non-Racik</h6>
                                         @endif
-
-                                      
                                         <table class="table table-sm table-bordered">
                                             <thead>
                                                 <tr>
@@ -253,7 +256,7 @@
                                                     <td>{{ $item['jumlah'] }}</td>
                                                     <td>{{ $item['aturan_pakai'] }}</td>
                                                     <td>
-                                                        <button type="button" wire:click="hapusItemResep({{ $groupedResepItems->keys()->search($namaRacik) * 1000 + $index }})" class="btn btn-danger btn-sm">Hapus</button>
+                                                        <button type="button" wire:click="hapusItemResep({{ $loop->index }})" class="btn btn-danger btn-sm">Hapus</button>
                                                     </td>
                                                 </tr>
                                                 @endforeach
@@ -285,7 +288,7 @@
                     <div class="modal-header">
                         <h6 class="modal-title" id="modalDetailPemeriksaanLabel">Detail Pemeriksaan</h6>
                         <button type="button" class="btn-close" wire:click="closeModal" aria-label="Close"></button>
-                    </div> 
+                    </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">ID Pendaftaran</label>
