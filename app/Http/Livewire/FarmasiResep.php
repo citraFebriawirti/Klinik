@@ -188,6 +188,7 @@ class FarmasiResep extends Component
                 $resep->update(['total_harga_resep' => $totalHarga]);
             });
 
+            $this->prosesResep($this->editResepId);
             $this->emit('showAlert', ['title' => 'Berhasil!', 'text' => 'Resep telah diperbarui.', 'icon' => 'success']);
             $this->closeEditModal();
             $this->emit('refreshComponent');
