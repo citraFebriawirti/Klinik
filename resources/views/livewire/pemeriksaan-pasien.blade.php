@@ -208,6 +208,9 @@
                                             @endforeach
                                         </select>
                                         @error('id_obat') <span class="text-danger">{{ $message }}</span> @enderror
+                                        @if($editIndex !== null && isset($resepItems[$editIndex]))
+                                        <span class="text-muted small">Mengedit obat: <b> {{ $resepItems[$editIndex]['nama_obat'] }} <b></span>
+                                        @endif
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Dosis</label>
