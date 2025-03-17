@@ -317,7 +317,7 @@ class FarmasiResep extends Component
     public function render()
     {
         return view('livewire.farmasi-resep', [
-            'resepList' => $this->getResepQuery()->paginate(10),
+            'resepList' => $this->getResepQuery()->paginate(5),
             'selectedResep' => $this->selectedResepId
                 ? Resep::with(['details.obat', 'pemeriksaan.pendaftaran.pasien'])->findOrFail($this->selectedResepId)
                 : null,
