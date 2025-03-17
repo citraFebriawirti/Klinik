@@ -330,8 +330,8 @@
                                     <td>{{ $detail->obat->id_obat }}</td>
                                     <td>{{ $detail->obat->nama_obat }}</td>
                                     <td>{{ $detail->dosis_resep_detail }}</td>
-                                    {{-- <td>{{ $detail->jumlah_resep_detail }}</td> --}}
-                                    <td>{{ $detail->obat->stok_obat }}</td>
+                                    <td>{{ $detail->jumlah_resep_detail }}</td>
+                                    {{-- <td>{{ $detail->obat->stok_obat }}</td> --}}
                                     <td>{{ $detail->obat->satuan_obat }}</td>
                                     <td>{{ $detail->aturan_pakai_resep_detail }}</td>
                                 </tr>

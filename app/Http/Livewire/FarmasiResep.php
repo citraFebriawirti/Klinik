@@ -15,8 +15,8 @@ class FarmasiResep extends Component
     use WithPagination;
 
     public $search = '';
-    public $isOpen = false; // Untuk modal struk
-    public $isEditOpen = false; // Untuk modal edit
+    public $isOpen = false;
+    public $isEditOpen = false;
     public $statusFilter = '';
     public $selectedResepId = null;
     public $editResepId = null;
@@ -27,15 +27,17 @@ class FarmasiResep extends Component
         'refreshComponent' => '$refresh',
         'closeModal' => 'closeModal',
         'closeEditModal' => 'closeEditModal',
+        'stokUpdated' => 'handleStokUpdated',
+        'stokTidakCukup' => 'handleStokTidakCukup'
     ];
 
     public function mount()
     {
         $this->resetPage();
-        $this->obatList = Obat::all()->toArray(); // Ambil daftar obat untuk dropdown
+        $this->obatList = Obat::all()->toArray();
     }
 
-    private function getResepQuery() // Bisa diubah menjadi getResepQuery() untuk camelCase
+    private function getResepQuery()
     {
         $query = Resep::with(['pemeriksaan.pendaftaran.pasien', 'details.obat', 'transaksi', 'pengambilanObat'])
             ->orderBy('created_at', 'desc');
@@ -104,8 +106,6 @@ class FarmasiResep extends Component
     public function updateDetail($index, $field, $value)
     {
         $this->editDetails[$index][$field] = $value;
-
-        // Jika is_racik diubah menjadi false, hapus nama_racik
         if ($field === 'is_racik' && !$value) {
             $this->editDetails[$index]['nama_racik'] = null;
         }
@@ -133,7 +133,6 @@ class FarmasiResep extends Component
 
     public function simpanEditResep()
     {
-        // Validasi dinamis berdasarkan is_racik
         $rules = [];
         foreach ($this->editDetails as $index => $detail) {
             $rules["editDetails.{$index}.id_obat"] = 'required|exists:tb_obat,id_obat';
@@ -149,11 +148,8 @@ class FarmasiResep extends Component
         try {
             DB::transaction(function () {
                 $resep = Resep::findOrFail($this->editResepId);
-
-                // Hapus detail resep yang ada
                 ResepDetail::where('id_resep', $this->editResepId)->delete();
 
-                // Kelompokkan dan jumlahkan obat yang sama dalam kelompok yang sama
                 $groupedDetails = [];
                 foreach ($this->editDetails as $detail) {
                     $key = $detail['is_racik'] ? ($detail['nama_racik'] ?? 'noname') : 'non-racik';
@@ -172,7 +168,6 @@ class FarmasiResep extends Component
                     $groupedDetails[$obatKey]['jumlah'] += $detail['jumlah'];
                 }
 
-                // Simpan detail resep yang telah dikelompokkan
                 $totalHarga = 0;
                 foreach ($groupedDetails as $detail) {
                     $obat = Obat::find($detail['id_obat']);
@@ -190,12 +185,12 @@ class FarmasiResep extends Component
                     ]);
                 }
 
-                // Update total harga resep
                 $resep->update(['total_harga_resep' => $totalHarga]);
             });
 
             $this->emit('showAlert', ['title' => 'Berhasil!', 'text' => 'Resep telah diperbarui.', 'icon' => 'success']);
             $this->closeEditModal();
+            $this->emit('refreshComponent');
         } catch (\Exception $e) {
             $this->emit('showAlert', ['title' => 'Gagal!', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
@@ -204,26 +199,74 @@ class FarmasiResep extends Component
     public function prosesResep($id)
     {
         try {
-            $resep = Resep::findOrFail($id);
+            \Log::info("Memulai prosesResep untuk ID: {$id}");
+            $resep = Resep::with('details')->findOrFail($id);
 
             if ($resep->status_resep !== 'Menunggu') {
                 throw new \Exception('Status resep tidak valid untuk diproses.');
             }
 
-            $resep->update(['status_resep' => 'Diproses']);
+            $resepDetails = $resep->details->map(function ($detail) use ($id) {
+                return [
+                    'id_resep' => $id,
+                    'id_obat' => $detail->id_obat,
+                    'jumlah_resep_detail' => $detail->jumlah_resep_detail,
+                ];
+            })->toArray();
 
-            $this->emit('showAlert', [
-                'title' => 'Berhasil!',
-                'text' => 'Resep telah diproses dan siap untuk pembayaran.',
-                'icon' => 'success'
-            ]);
+            if (empty($resepDetails)) {
+                throw new \Exception('Tidak ada detail resep untuk diproses.');
+            }
+
+            \Log::info("Mengirim event kurangiStokObat", ['resepDetails' => $resepDetails]);
+            $this->emitTo('obat', 'kurangiStokObat', $resepDetails);
+            $this->selectedResepId = $id;
         } catch (\Exception $e) {
+            \Log::error("Error di prosesResep: {$e->getMessage()}");
             $this->emit('showAlert', [
                 'title' => 'Gagal!',
-                'text' => $e->getMessage() ?: 'Terjadi kesalahan saat memproses resep.',
+                'text' => $e->getMessage(),
+                'icon' => 'error'
+            ]);
+            $this->emit('refreshComponent');
+        }
+    }
+
+    public function handleStokUpdated($success)
+    {
+        \Log::info("handleStokUpdated dipanggil", ['success' => $success, 'selectedResepId' => $this->selectedResepId]);
+        if ($success && $this->selectedResepId) {
+            $resep = Resep::find($this->selectedResepId);
+            if ($resep && $resep->status_resep === 'Menunggu') {
+                $resep->update(['status_resep' => 'Diproses']);
+                $this->emit('showAlert', [
+                    'title' => 'Berhasil!',
+                    'text' => 'Resep telah diproses dan stok obat diperbarui.',
+                    'icon' => 'success'
+                ]);
+                $this->emit('refreshComponent');
+                $this->selectedResepId = null; // Reset setelah sukses
+            }
+        } else {
+            $this->emit('showAlert', [
+                'title' => 'Gagal!',
+                'text' => 'Terjadi kesalahan saat memperbarui stok obat.',
                 'icon' => 'error'
             ]);
         }
+    }
+
+    public function handleStokTidakCukup($data)
+    {
+        \Log::info("handleStokTidakCukup dipanggil", $data);
+        $resepId = $data['resep_id'];
+        $message = $data['message'];
+        $this->dispatchBrowserEvent('confirmEdit', [
+            'title' => 'Stok Tidak Cukup!',
+            'text' => $message . ' Apakah Anda ingin mengubah data resep?',
+            'icon' => 'warning',
+            'resep_id' => $resepId
+        ]);
     }
 
     public function selesaikanResep($id)
@@ -241,8 +284,7 @@ class FarmasiResep extends Component
 
             DB::transaction(function () use ($id, $resep) {
                 $resep->update(['status_resep' => 'Selesai']);
-
-                XPengambilanObat::updateOrCreate( // Perbaiki 'xPengambilanObat'
+                XPengambilanObat::updateOrCreate(
                     ['id_resep' => $id],
                     [
                         'status_pengambilan_obat' => 'Diambil',
@@ -256,6 +298,7 @@ class FarmasiResep extends Component
                 'text' => 'Resep telah selesai dan obat telah diambil pasien.',
                 'icon' => 'success'
             ]);
+            $this->emit('refreshComponent');
         } catch (\Exception $e) {
             $this->emit('showAlert', [
                 'title' => 'Gagal!',

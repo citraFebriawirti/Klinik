@@ -16,7 +16,6 @@ class PemeriksaanPasien extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
 
-    // Properti untuk data pasien dan pemeriksaan
     public $id_pendaftaran;
     public $id_dokter;
     public $diagnosa;
@@ -24,9 +23,8 @@ class PemeriksaanPasien extends Component
     protected $daftarPasien;
     public $dokterList = [];
     public $obatList = [];
-    public $filteredObatList = []; // Daftar obat yang difilter berdasarkan pilihan
+    public $filteredObatList = [];
 
-    // Properti untuk resep
     public $resepItems = [];
     public $id_obat;
     public $dosis;
@@ -36,7 +34,6 @@ class PemeriksaanPasien extends Component
     public $nama_racik;
     public $nama_racik_aktif;
 
-    // Properti untuk kontrol UI
     public $isOpen = false;
     public $isDetailOpen = false;
     public $selectedPemeriksaan = null;
@@ -46,14 +43,13 @@ class PemeriksaanPasien extends Component
     public function mount()
     {
         $this->obatList = Obat::all()->toArray();
-        $this->filteredObatList = $this->obatList; // Inisialisasi daftar obat yang difilter
+        $this->filteredObatList = $this->obatList;
         $this->ambilPasien();
     }
 
     public function ambilPasien()
     {
         $query = Pendaftaran::with('pasien', 'poli', 'pemeriksaan.resep.details.obat');
-
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('id_pendaftaran', 'like', '%' . $this->search . '%')
@@ -63,11 +59,9 @@ class PemeriksaanPasien extends Component
                     });
             });
         }
-
         if ($this->statusFilter) {
             $query->where('status_pendaftaran', $this->statusFilter);
         }
-
         $this->daftarPasien = $query->orderBy('created_at', 'desc')->paginate(5);
     }
 
@@ -136,7 +130,7 @@ class PemeriksaanPasien extends Component
         $this->nama_racik = '';
         $this->nama_racik_aktif = null;
         $this->selectedPemeriksaan = null;
-        $this->filteredObatList = $this->obatList; // Reset filteredObatList saat reset
+        $this->filteredObatList = $this->obatList;
     }
 
     public function updatedIsRacik()
@@ -152,8 +146,6 @@ class PemeriksaanPasien extends Component
     public function filterObatList()
     {
         $usedObatIds = [];
-
-        // Ambil ID obat yang sudah digunakan dalam kelompok aktif (racik atau non-racik)
         foreach ($this->resepItems as $item) {
             if ($this->is_racik && $item['nama_racik'] === $this->nama_racik_aktif) {
                 $usedObatIds[] = $item['id_obat'];
@@ -161,13 +153,7 @@ class PemeriksaanPasien extends Component
                 $usedObatIds[] = $item['id_obat'];
             }
         }
-
-        // Filter daftar obat untuk hanya menampilkan obat yang belum digunakan
-        $this->filteredObatList = array_filter($this->obatList, function ($obat) use ($usedObatIds) {
-            return !in_array($obat['id_obat'], $usedObatIds);
-        });
-
-        // Reset array keys
+        $this->filteredObatList = array_filter($this->obatList, fn ($obat) => !in_array($obat['id_obat'], $usedObatIds));
         $this->filteredObatList = array_values($this->filteredObatList);
     }
 
@@ -182,8 +168,6 @@ class PemeriksaanPasien extends Component
         ]);
 
         $obat = Obat::find($this->id_obat);
-
-        // Jika racikan dan belum ada nama aktif, set nama_racik_aktif
         if ($this->is_racik && !$this->nama_racik_aktif) {
             $this->nama_racik_aktif = $this->nama_racik;
         }
@@ -197,7 +181,6 @@ class PemeriksaanPasien extends Component
             'nama_racik' => $this->is_racik ? $this->nama_racik_aktif : null,
         ];
 
-        // Cari apakah ada item dengan id_obat yang sama dalam kelompok yang sama
         $existingIndex = null;
         foreach ($this->resepItems as $index => $item) {
             if ($item['id_obat'] === $this->id_obat && $item['nama_racik'] === $newItem['nama_racik']) {
@@ -207,20 +190,15 @@ class PemeriksaanPasien extends Component
         }
 
         if ($existingIndex !== null) {
-            // Jika ada duplikat, jumlahkan jumlah
             $this->resepItems[$existingIndex]['jumlah'] += $this->jumlah;
         } else {
-            // Jika tidak ada duplikat, tambahkan item baru
             $this->resepItems[] = $newItem;
         }
 
-        // Reset input kecuali nama_racik_aktif jika racikan
         $this->reset(['id_obat', 'dosis', 'jumlah', 'aturan_pakai']);
         if (!$this->is_racik) {
             $this->nama_racik = '';
         }
-
-        // Update daftar obat yang tersedia
         $this->filterObatList();
     }
 
@@ -242,14 +220,10 @@ class PemeriksaanPasien extends Component
     {
         unset($this->resepItems[$index]);
         $this->resepItems = array_values($this->resepItems);
-
-        // Jika tidak ada item dengan nama_racik_aktif lagi, reset nama_racik_aktif
         $racikExists = collect($this->resepItems)->contains('nama_racik', $this->nama_racik_aktif);
         if (!$racikExists) {
             $this->resetNamaRacik();
         }
-
-        // Update daftar obat yang tersedia setelah penghapusan
         $this->filterObatList();
     }
 
