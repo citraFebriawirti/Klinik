@@ -239,6 +239,39 @@
             printWindow.document.close();
             printWindow.print();
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            function initTomSelect() {
+                document.querySelectorAll("[data-tomselect]").forEach(el => {
+                    if (el.tomselect) {
+                        el.tomselect.destroy();
+                    }
+        
+                    let tomSelect = new TomSelect(el, {
+                        create: false,
+                        searchField: "text",
+                        sortField: { field: "text", direction: "asc" }
+                    });
+        
+                    el.addEventListener("change", function () {
+                        Livewire.emit("statusUpdated", this.value);
+                    });
+        
+                    console.log(`Tom Select initialized on ${el.id}`);
+                });
+            }
+        
+            initTomSelect();
+        
+            Livewire.hook("message.processed", () => {
+                setTimeout(() => {
+                    console.log("Livewire update detected");
+                    initTomSelect();
+                }, 100);
+            });
+        
+           
+        });
     </script>
     @endpush
 
@@ -406,7 +439,7 @@
         <!-- Modal Struk -->
         @if($isOpen)
         <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="strukModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-dialog modal-xl" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="strukModalLabel">Struk Obat</h5>
@@ -493,9 +526,9 @@
                             <table class="table table-bordered table-editable">
                                 <thead>
                                     <tr>
-                                        <th>Obat</th>
+                                        <th style="width: 40%">Obat</th>
                                         <th>Jumlah</th>
-                                        <th>Dosis</th>
+                                        <th style="width: 10px">Dosis</th>
                                         <th>Aturan Pakai</th>
                                         <th>Racik</th>
                                         <th>Nama Racikan</th>
@@ -506,9 +539,10 @@
                                     @foreach ($editDetails as $index => $detail)
                                     <tr>
                                         <td>
-                                            <select wire:model="editDetails.{{ $index }}.id_obat" class="form-control">
+                                            <select wire:model="editDetails.{{ $index }}.id_obat" class="f"   data-tomselect>
                                                 <option value="">Pilih Obat</option>
                                                 @foreach ($obatList as $obat)
+                                              
                                                 <option value="{{ $obat['id_obat'] }}">{{ $obat['nama_obat'] }} ({{ $obat['jenis_obat'] }}) - Stok: {{ $obat['stok_obat'] }}</option>
                                                 @endforeach
                                             </select>
