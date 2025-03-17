@@ -216,7 +216,7 @@
                                         @error('dosis') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Jumlah Obat</label>
+                                        <label class="form-label">Jumlah</label>
                                         <input type="number" class="form-control" wire:model="jumlah" min="1">
                                         @error('jumlah') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
@@ -319,7 +319,7 @@
                                     <th>Kode</th>
                                     <th>Nama</th>
                                     <th>Dosis</th>
-                                    <th>Jumlah Obat</th>
+                                    <th>Qty</th>
                                     <th>Satuan</th>
                                     <th>Cara Pakai</th>
                                 </tr>
@@ -331,7 +331,6 @@
                                     <td>{{ $detail->obat->nama_obat }}</td>
                                     <td>{{ $detail->dosis_resep_detail }}</td>
                                     <td>{{ $detail->jumlah_resep_detail }}</td>
-                                    {{-- <td>{{ $detail->obat->stok_obat }}</td> --}}
                                     <td>{{ $detail->obat->satuan_obat }}</td>
                                     <td>{{ $detail->aturan_pakai_resep_detail }}</td>
                                 </tr>
