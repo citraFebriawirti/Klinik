@@ -212,6 +212,7 @@
                                         <span class="text-muted small">Mengedit obat: <b> {{ $resepItems[$editIndex]['nama_obat'] }} <b></span>
                                         @endif
                                     </div>
+
                                     <div class="mb-3">
                                         <label class="form-label">Dosis</label>
                                         <input type="text" class="form-control" wire:model="dosis" placeholder="Contoh: 1x sehari">
