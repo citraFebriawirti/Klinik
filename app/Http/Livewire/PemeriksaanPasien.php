@@ -24,7 +24,7 @@ class PemeriksaanPasien extends Component
     protected $daftarPasien;
     public $dokterList = [];
     public $obatList = [];
-    public $filteredObatList = []; // Daftar obat yang difilter berdasarkan pilihan
+    public $filteredObatList = [];
 
     // Properti untuk resep
     public $resepItems = [];
@@ -35,6 +35,7 @@ class PemeriksaanPasien extends Component
     public $is_racik = false;
     public $nama_racik;
     public $nama_racik_aktif;
+    public $editIndex = null;
 
     // Properti untuk kontrol UI
     public $isOpen = false;
@@ -46,7 +47,7 @@ class PemeriksaanPasien extends Component
     public function mount()
     {
         $this->obatList = Obat::all()->toArray();
-        $this->filteredObatList = $this->obatList; // Inisialisasi daftar obat yang difilter
+        $this->filteredObatList = $this->obatList;
         $this->ambilPasien();
     }
 
@@ -135,8 +136,9 @@ class PemeriksaanPasien extends Component
         $this->is_racik = false;
         $this->nama_racik = '';
         $this->nama_racik_aktif = null;
+        $this->editIndex = null;
         $this->selectedPemeriksaan = null;
-        $this->filteredObatList = $this->obatList; // Reset filteredObatList saat reset
+        $this->filteredObatList = $this->obatList;
     }
 
     public function updatedIsRacik()
@@ -153,27 +155,22 @@ class PemeriksaanPasien extends Component
     {
         $usedObatIds = [];
 
-        // Ambil ID obat yang sudah digunakan dalam kelompok aktif saat ini
         foreach ($this->resepItems as $item) {
             if ($this->is_racik && $this->nama_racik_aktif && $item['nama_racik'] === $this->nama_racik_aktif) {
-                // Hanya masukkan obat dari racikan aktif saat mode racik dan nama_racik_aktif ada
                 $usedObatIds[] = $item['id_obat'];
             } elseif (!$this->is_racik && !$item['nama_racik']) {
-                // Hanya masukkan obat non-racik saat mode non-racik
                 $usedObatIds[] = $item['id_obat'];
             }
         }
 
-        // Filter daftar obat
         $this->filteredObatList = array_filter($this->obatList, function ($obat) use ($usedObatIds) {
             return !in_array($obat['id_obat'], $usedObatIds);
         });
 
-        // Reset array keys
         $this->filteredObatList = array_values($this->filteredObatList);
     }
 
-    public function tambahItemResep()
+    public function simpanItemResep()
     {
         $this->validate([
             'id_obat' => 'required|exists:tb_obat,id_obat',
@@ -185,7 +182,6 @@ class PemeriksaanPasien extends Component
 
         $obat = Obat::find($this->id_obat);
 
-        // Jika racikan dan belum ada nama aktif, set nama_racik_aktif
         if ($this->is_racik && !$this->nama_racik_aktif) {
             $this->nama_racik_aktif = $this->nama_racik;
         }
@@ -199,30 +195,43 @@ class PemeriksaanPasien extends Component
             'nama_racik' => $this->is_racik ? $this->nama_racik_aktif : null,
         ];
 
-        // Cari apakah ada item dengan id_obat yang sama dalam kelompok yang sama
-        $existingIndex = null;
-        foreach ($this->resepItems as $index => $item) {
-            if ($item['id_obat'] === $this->id_obat && $item['nama_racik'] === $newItem['nama_racik']) {
-                $existingIndex = $index;
-                break;
+        if ($this->editIndex !== null) {
+            $this->resepItems[$this->editIndex] = $newItem;
+            $this->editIndex = null;
+        } else {
+            $existingIndex = null;
+            foreach ($this->resepItems as $index => $item) {
+                if ($item['id_obat'] === $this->id_obat && $item['nama_racik'] === $newItem['nama_racik']) {
+                    $existingIndex = $index;
+                    break;
+                }
+            }
+
+            if ($existingIndex !== null) {
+                $this->resepItems[$existingIndex]['jumlah'] += $this->jumlah;
+            } else {
+                $this->resepItems[] = $newItem;
             }
         }
 
-        if ($existingIndex !== null) {
-            // Jika ada duplikat, jumlahkan jumlah
-            $this->resepItems[$existingIndex]['jumlah'] += $this->jumlah;
-        } else {
-            // Jika tidak ada duplikat, tambahkan item baru
-            $this->resepItems[] = $newItem;
-        }
-
-        // Reset input kecuali nama_racik_aktif jika racikan
         $this->reset(['id_obat', 'dosis', 'jumlah', 'aturan_pakai']);
         if (!$this->is_racik) {
             $this->nama_racik = '';
         }
 
-        // Update daftar obat yang tersedia
+        $this->filterObatList();
+    }
+
+    public function editItemResep($index)
+    {
+        $item = $this->resepItems[$index];
+        $this->editIndex = $index;
+        $this->id_obat = $item['id_obat'];
+        $this->dosis = $item['dosis'];
+        $this->jumlah = $item['jumlah'];
+        $this->aturan_pakai = $item['aturan_pakai'];
+        $this->is_racik = $item['nama_racik'] ? true : false;
+        $this->nama_racik_aktif = $item['nama_racik'];
         $this->filterObatList();
     }
 
@@ -230,6 +239,8 @@ class PemeriksaanPasien extends Component
     {
         $this->nama_racik_aktif = $namaRacik;
         $this->is_racik = true;
+        $this->editIndex = null;
+        $this->reset(['id_obat', 'dosis', 'jumlah', 'aturan_pakai']);
         $this->filterObatList();
     }
 
@@ -237,6 +248,7 @@ class PemeriksaanPasien extends Component
     {
         $this->nama_racik_aktif = null;
         $this->nama_racik = '';
+        $this->editIndex = null;
         $this->filterObatList();
     }
 
@@ -245,13 +257,11 @@ class PemeriksaanPasien extends Component
         unset($this->resepItems[$index]);
         $this->resepItems = array_values($this->resepItems);
 
-        // Jika tidak ada item dengan nama_racik_aktif lagi, reset nama_racik_aktif
         $racikExists = collect($this->resepItems)->contains('nama_racik', $this->nama_racik_aktif);
         if (!$racikExists) {
             $this->resetNamaRacik();
         }
 
-        // Update daftar obat yang tersedia setelah penghapusan
         $this->filterObatList();
     }
 

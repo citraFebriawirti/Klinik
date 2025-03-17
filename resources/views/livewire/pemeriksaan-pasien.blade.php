@@ -199,7 +199,6 @@
                                     @endif
                                     @endif
 
-
                                     <div class="mb-3">
                                         <label class="form-label">Obat</label>
                                         <select wire:model="id_obat" class="form-control">
@@ -225,12 +224,13 @@
                                         <input type="text" class="form-control" wire:model="aturan_pakai" placeholder="Contoh: Setelah makan">
                                         @error('aturan_pakai') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
-                                    <button type="button" wire:click="tambahItemResep" class="btn btn-primary btn-sm">Tambah ke Resep</button>
+                                    <button type="button" wire:click="simpanItemResep" class="btn btn-primary btn-sm">{{ $editIndex !== null ? 'Simpan Perubahan' : 'Simpan' }}</button>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mt-3">
                                         @php
                                         $groupedResepItems = collect($resepItems)->groupBy('nama_racik');
+                                        $flatIndex = 0;
                                         @endphp
                                         @foreach ($groupedResepItems as $namaRacik => $items)
                                         @if ($namaRacik)
@@ -249,16 +249,18 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($items as $index => $item)
+                                                @foreach ($items as $item)
                                                 <tr>
                                                     <td>{{ $item['nama_obat'] }}</td>
                                                     <td>{{ $item['dosis'] }}</td>
                                                     <td>{{ $item['jumlah'] }}</td>
                                                     <td>{{ $item['aturan_pakai'] }}</td>
                                                     <td>
-                                                        <button type="button" wire:click="hapusItemResep({{ $loop->index }})" class="btn btn-danger btn-sm">Hapus</button>
+                                                        <button type="button" wire:click="editItemResep({{ $flatIndex }})" class="btn btn-warning btn-sm">Edit</button>
+                                                        <button type="button" wire:click="hapusItemResep({{ $flatIndex }})" class="btn btn-danger btn-sm">Hapus</button>
                                                     </td>
                                                 </tr>
+                                                @php $flatIndex++; @endphp
                                                 @endforeach
                                             </tbody>
                                         </table>
