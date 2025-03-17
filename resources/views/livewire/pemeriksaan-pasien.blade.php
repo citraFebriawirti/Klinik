@@ -48,6 +48,39 @@
                 }
             });
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            function initTomSelect() {
+                document.querySelectorAll("[data-tomselect]").forEach(el => {
+                    if (el.tomselect) {
+                        el.tomselect.destroy();
+                    }
+        
+                    let tomSelect = new TomSelect(el, {
+                        create: false,
+                        searchField: "text",
+                        sortField: { field: "text", direction: "asc" }
+                    });
+        
+                    el.addEventListener("change", function () {
+                        Livewire.emit("statusUpdated", this.value);
+                    });
+        
+                    console.log(`Tom Select initialized on ${el.id}`);
+                });
+            }
+        
+            initTomSelect();
+        
+            Livewire.hook("message.processed", () => {
+                setTimeout(() => {
+                    console.log("Livewire update detected");
+                    initTomSelect();
+                }, 100);
+            });
+        
+           
+        });
     </script>
     @endpush
 
@@ -156,7 +189,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Dokter</label>
-                                        <select wire:model="id_dokter" class="form-control">
+                                        <select wire:model.defer="id_dokter" class="" data-tomselect>
                                             <option value="">Pilih Dokter</option>
                                             @foreach ($dokterList as $dokter)
                                             <option value="{{ $dokter->id_dokter }}">{{ $dokter->nama_dokter }} - {{ $dokter->spesialisasi_dokter }}</option>
@@ -166,12 +199,12 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Diagnosa</label>
-                                        <input type="text" class="form-control" wire:model="diagnosa">
+                                        <input type="text" class="form-control" wire:model.defer="diagnosa">
                                         @error('diagnosa') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Catatan</label>
-                                        <textarea class="form-control" wire:model="catatan"></textarea>
+                                        <textarea class="form-control" wire:model.defer="catatan"></textarea>
                                         @error('catatan') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
@@ -201,7 +234,7 @@
 
                                     <div class="mb-3">
                                         <label class="form-label">Obat</label>
-                                        <select wire:model="id_obat" class="form-control">
+                                        <select wire:model.defer="id_obat" class="" data-tomselect>
                                             <option value="">Pilih Obat</option>
                                             @foreach ($filteredObatList as $obat)
                                             <option value="{{ $obat['id_obat'] }}">{{ $obat['nama_obat'] }} ({{ $obat['jenis_obat'] }})</option>
@@ -215,17 +248,17 @@
 
                                     <div class="mb-3">
                                         <label class="form-label">Dosis</label>
-                                        <input type="text" class="form-control" wire:model="dosis" placeholder="Contoh: 1x sehari">
+                                        <input type="text" class="form-control" wire:model.defer="dosis" placeholder="Contoh: 1x sehari">
                                         @error('dosis') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Jumlah</label>
-                                        <input type="number" class="form-control" wire:model="jumlah" min="1">
+                                        <input type="number" class="form-control" wire:model.defer="jumlah" min="1">
                                         @error('jumlah') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Aturan Pakai</label>
-                                        <input type="text" class="form-control" wire:model="aturan_pakai" placeholder="Contoh: Setelah makan">
+                                        <input type="text" class="form-control" wire:model.defer="aturan_pakai" placeholder="Contoh: Setelah makan">
                                         @error('aturan_pakai') <span class="text-danger">{{ $message }}</span> @enderror
                                     </div>
                                     <button type="button" wire:click="simpanItemResep" class="btn btn-primary btn-sm">{{ $editIndex !== null ? 'Simpan Perubahan' : 'Simpan' }}</button>
