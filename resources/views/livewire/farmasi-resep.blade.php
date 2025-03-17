@@ -96,104 +96,142 @@
         .table-editable .btn-sm {
             padding: 3px 8px;
         }
+
+        /* Loading Spinner */
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            vertical-align: middle;
+        }
     </style>
     @endpush
 
     @push('scripts')
     <script>
-        window.addEventListener('showAlert', event => {
-            Swal.fire({
-                title: event.detail.title,
-                text: event.detail.text,
-                icon: event.detail.icon,
-                confirmButtonText: 'OK'
+        document.addEventListener('livewire:load', function () {
+            window.addEventListener('showAlert', event => {
+                Swal.fire({
+                    title: event.detail.title,
+                    text: event.detail.text,
+                    icon: event.detail.icon,
+                    confirmButtonText: 'OK'
+                });
+            });
+
+            window.addEventListener('confirmEdit', event => {
+                Swal.fire({
+                    title: event.detail.title,
+                    text: event.detail.text,
+                    icon: event.detail.icon,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Ubah Resep',
+                    cancelButtonText: 'Tidak'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.emit('openEditModal', event.detail.resep_id);
+                    }
+                });
+            });
+
+            window.addEventListener('confirmProses', event => {
+                Swal.fire({
+                    title: event.detail.title,
+                    text: event.detail.text,
+                    icon: event.detail.icon,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Proses',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.emit('confirmProsesResep', event.detail.resep_id);
+                    }
+                });
             });
         });
 
-        // Fungsi untuk mencetak isi modal
         function printStruk() {
             const modalContent = document.querySelector('.modal-content');
             const printWindow = window.open('', '', 'height=600,width=800');
             printWindow.document.write('<html><head><title>Struk Obat</title>');
             printWindow.document.write(`
-                    <style>
-                        body {
-                            font-family: 'Arial', sans-serif;
-                            margin: 20px;
-                            padding: 0;
-                            color: #333;
-                        }
-                        .modal-content {
-                            border: 4px double #28a745; /* Border ganda hijau */
-                            border-radius: 10px;
-                            width: 100%;
-                            max-width: 700px;
-                            margin: 0 auto;
-                            padding: 20px;
-                            background: #fff;
-                            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                            position: relative;
-                        }
-                        .modal-content::before {
-                            content: '';
-                            position: absolute;
-                            top: -8px;
-                            left: -8px;
-                            right: -8px;
-                            bottom: -8px;
-                            border: 2px solid #28a745; /* Border luar hijau */
-                            border-radius: 14px;
-                            z-index: -1;
-                        }
-                        .modal-header, .modal-footer {
-                            display: none;
-                        }
-                        .modal-body {
-                            padding: 0;
-                        }
-                        h6 {
-                            font-size: 14px;
-                            font-weight: bold;
-                            margin: 10px 0 5px;
-                            color: #28a745; /* Warna hijau untuk header */
-                        }
-                        ul.list-group {
-                            list-style-type: none;
-                            padding: 0;
-                            margin: 0;
-                        }
-                        .list-group-item {
-                            display: flex;
-                            justify-content: space-between;
-                            padding: 8px 12px;
-                            margin-bottom: 5px;
-                            border-bottom: 1px dashed #28a745; /* Garis hijau putus-putus */
-                            font-size: 12px;
-                        }
-                        .list-group-item:last-child {
-                            border-bottom: none;
-                        }
-                        hr {
-                            border-top: 1px dashed #28a745; /* Garis hijau putus-putus */
-                            margin: 15px 0;
-                        }
-                        .text-right {
-                            text-align: right;
-                            font-size: 14px;
-                            font-weight: bold;
-                            color: #dc3545; /* Total harga tetap merah */
-                        }
-                        .print-header {
-                            text-align: center;
-                            font-size: 16px;
-                            font-weight: bold;
-                            margin-bottom: 20px;
-                            color: #28a745; /* Warna hijau untuk judul */
-                            border-bottom: 2px solid #28a745;
-                            padding-bottom: 5px;
-                        }
-                    </style>
-                `);
+                <style>
+                    body {
+                        font-family: 'Arial', sans-serif;
+                        margin: 20px;
+                        padding: 0;
+                        color: #333;
+                    }
+                    .modal-content {
+                        border: 4px double #28a745;
+                        border-radius: 10px;
+                        width: 100%;
+                        max-width: 700px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        background: #fff;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                        position: relative;
+                    }
+                    .modal-content::before {
+                        content: '';
+                        position: absolute;
+                        top: -8px;
+                        left: -8px;
+                        right: -8px;
+                        bottom: -8px;
+                        border: 2px solid #28a745;
+                        border-radius: 14px;
+                        z-index: -1;
+                    }
+                    .modal-header, .modal-footer {
+                        display: none;
+                    }
+                    .modal-body {
+                        padding: 0;
+                    }
+                    h6 {
+                        font-size: 14px;
+                        font-weight: bold;
+                        margin: 10px 0 5px;
+                        color: #28a745;
+                    }
+                    ul.list-group {
+                        list-style-type: none;
+                        padding: 0;
+                        margin: 0;
+                    }
+                    .list-group-item {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 8px 12px;
+                        margin-bottom: 5px;
+                        border-bottom: 1px dashed #28a745;
+                        font-size: 12px;
+                    }
+                    .list-group-item:last-child {
+                        border-bottom: none;
+                    }
+                    hr {
+                        border-top: 1px dashed #28a745;
+                        margin: 15px 0;
+                    }
+                    .text-right {
+                        text-align: right;
+                        font-size: 14px;
+                        font-weight: bold;
+                        color: #dc3545;
+                    }
+                    .print-header {
+                        text-align: center;
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-bottom: 20px;
+                        color: #28a745;
+                        border-bottom: 2px solid #28a745;
+                        padding-bottom: 5px;
+                    }
+                </style>
+            `);
             printWindow.document.write('</head><body>');
             printWindow.document.write('<div class="print-header">STRUK PEMBELIAN OBAT</div>');
             printWindow.document.write(modalContent.innerHTML);
@@ -203,6 +241,8 @@
         }
     </script>
     @endpush
+
+    @livewire('obat') <!-- Pastikan komponen Obat dimuat -->
 
     <div class="container-fluid" id="container-wrapper">
         <!-- Header -->
@@ -324,7 +364,16 @@
                                         </td>
                                         <td>
                                             @if($resep->status_resep === 'Menunggu')
-                                            <button wire:click="prosesResep({{ $resep->id_resep }})" class="btn btn-primary btn-sm mb-1">Proses Obat</button>
+                                            <button wire:click="prosesResep({{ $resep->id_resep }})" 
+                                                    wire:loading.attr="disabled" 
+                                                    class="btn btn-primary btn-sm mb-1">
+                                                <span wire:loading wire:target="prosesResep({{ $resep->id_resep }})">
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...
+                                                </span>
+                                                <span wire:loading.remove wire:target="prosesResep({{ $resep->id_resep }})">
+                                                    Proses Obat
+                                                </span>
+                                            </button>
                                             <button wire:click="openEditModal({{ $resep->id_resep }})" class="btn btn-warning btn-sm mb-1">Edit Resep</button>
                                             @elseif($resep->status_resep === 'Diproses')
                                             @if($resep->transaksi && $resep->transaksi->status_transaksi === 'Lunas')
@@ -332,7 +381,6 @@
                                             @else
                                             <span class="text-muted">Menunggu Pembayaran</span>
                                             @endif
-                                            <button wire:click="openEditModal({{ $resep->id_resep }})" class="btn btn-warning btn-sm mb-1">Edit Resep</button>
                                             <button wire:click="showStruk({{ $resep->id_resep }})" class="btn btn-info btn-sm mb-1">Struk Obat</button>
                                             @else
                                             <button wire:click="showStruk({{ $resep->id_resep }})" class="btn btn-info btn-sm mb-1">Struk Obat</button>
@@ -461,7 +509,7 @@
                                             <select wire:model="editDetails.{{ $index }}.id_obat" class="form-control">
                                                 <option value="">Pilih Obat</option>
                                                 @foreach ($obatList as $obat)
-                                                <option value="{{ $obat['id_obat'] }}">{{ $obat['nama_obat'] }} ({{ $obat['jenis_obat'] }})</option>
+                                                <option value="{{ $obat['id_obat'] }}">{{ $obat['nama_obat'] }} ({{ $obat['jenis_obat'] }}) - Stok: {{ $obat['stok_obat'] }}</option>
                                                 @endforeach
                                             </select>
                                             @error("editDetails.{$index}.id_obat") <span class="text-danger">{{ $message }}</span> @enderror
